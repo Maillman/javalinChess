@@ -21,8 +21,8 @@ public class ServiceTests {
     private final GameService gameService;
     private final ClearService clearService;
 
-    private static final UserData EXISTING_USER = new UserData("existingUser", "existingPass", "existingEmail");
-    private static final UserData NEW_USER = new UserData("newUser", "newPass", "newEmail");
+    private static final UserData EXISTING_USER = new UserData("existingUser", "existingPass", "existingEmail@mail.com");
+    private static final UserData NEW_USER = new UserData("newUser", "newPass", "newEmail@mail.com");
     private AuthData authData;
 
     public ServiceTests() {
