@@ -2,6 +2,7 @@ package server;
 
 import dataaccess.DataAccessException;
 import io.javalin.*;
+import io.javalin.json.JavalinGson;
 
 public class Server {
 
@@ -13,7 +14,7 @@ public class Server {
         handler = new Handler();
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
-            config.jsonMapper(handler.getJavalinGson());
+            config.jsonMapper(new JavalinGson());
         })
                 .post("/user", handler::register)
                 .post("/session", handler::login)

@@ -15,7 +15,6 @@ import dataaccess.sql.SQLAuthDAO;
 import dataaccess.sql.SQLGameDAO;
 import dataaccess.sql.SQLUserDAO;
 import io.javalin.http.Context;
-import io.javalin.json.JsonMapper;
 import model.AuthData;
 import model.GameData;
 import model.JoinData;
@@ -25,15 +24,12 @@ import service.ClearService;
 import service.GameService;
 import service.UserService;
 
-import java.lang.reflect.Type;
 import java.util.Map;
 
 public class Handler {
     private final UserService userService;
     private final GameService gameService;
     private final ClearService clearService;
-    //private final Gson serializer;
-    private final JavalinGson javalinGson;
 
     public Handler() {
         UserDAO userDAO;
@@ -53,33 +49,6 @@ public class Handler {
         this.userService = new UserService(userDAO, authDAO);
         this.gameService = new GameService(userDAO, authDAO, gameDAO);
         this.clearService = new ClearService(userDAO, authDAO, gameDAO);
-        Gson gson = new GsonBuilder().create();
-        this.javalinGson = new JavalinGson(gson);
-    }
-
-    public JavalinGson getJavalinGson() {
-        return this.javalinGson;
-    }
-
-    private class JavalinGson implements JsonMapper {
-        private final Gson gson;
-
-        public JavalinGson(Gson gson) {
-            this.gson = gson;
-        }
-
-        @Override
-        public String toJsonString(Object obj, Type type) {
-            return gson.toJson(obj, type);
-        }
-
-        @Override
-        public <T> T fromJsonString(String json, Type type) {
-            return gson.fromJson(json, type);
-        }
-
-        // Optional: Implement other methods like toJsonStream and fromJsonStream
-        // for better performance with large objects.
     }
 
     public void register(Context ctx) throws DataAccessException {
