@@ -34,9 +34,9 @@ public class UserService {
         if(user.username()==null||user.password()==null||user.email()==null){
             throw new DataAccessException("Error: At least one field was empty, make sure all fields are filled", 400);
         }
-        if(!isValidEmail(user.email())){
-            throw new DataAccessException("Error: email must be a valid email address", 400);
-        }
+//        if(!isValidEmail(user.email())){
+//            throw new DataAccessException("Error: email must be a valid email address", 400);
+//        }
         //Make sure username isn't taken
         UserData existingUser = this.userDAO.getUser(user.username());
         if(existingUser!=null){

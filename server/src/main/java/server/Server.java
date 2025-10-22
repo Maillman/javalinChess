@@ -9,8 +9,12 @@ public class Server {
     private final Handler handler;
 
     public Server() {
+
         handler = new Handler();
-        javalin = Javalin.create(config -> config.staticFiles.add("web"))
+        javalin = Javalin.create(config -> {
+            config.staticFiles.add("web");
+            config.jsonMapper(handler.getJavalinGson());
+        })
                 .post("/user", handler::register)
                 .post("/session", handler::login)
                 .delete("/session", handler::logout)
