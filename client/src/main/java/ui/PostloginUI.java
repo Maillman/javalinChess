@@ -2,23 +2,29 @@ package ui;
 
 import client.ServerFacade;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.Scanner;
+
 public class PostloginUI extends ClientUI{
-    public PostloginUI(ServerFacade serverFacade) {
-        super(serverFacade);
+    private String username;
+    public PostloginUI(ServerFacade serverFacade, Scanner scanner, PrintStream out, String username) {
+        super(serverFacade, scanner, out);
+        this.username = username;
     }
 
     @Override
-    public String eval(String command) {
+    public Object eval(String command) {
         return null;
     }
 
     @Override
-    public void help() {
-
+    public String help() {
+        return null;
     }
 
     @Override
     public String currentState() {
-        return null;
+        return "["+ username +"]";
     }
 }

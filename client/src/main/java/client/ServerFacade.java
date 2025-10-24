@@ -12,16 +12,20 @@ public class ServerFacade {
     private final HTTPCommunicator httpCommunicator = new HTTPCommunicator();
     private final String serverUrl;
     private String authToken = null;
+    //TODO: Remove when fully working with server
+    private static final String TEMPAUTHTOKEN = "TEMPAUTHTOKEN";
 
     public ServerFacade(String url) {
         this.serverUrl = url;
     }
 
     public AuthData register(UserData user){
-        return new AuthData("TODOAUTHTOKEN", user.username());
+        this.authToken = TEMPAUTHTOKEN;
+        return new AuthData(TEMPAUTHTOKEN, user.username());
     }
     public AuthData login(UserData user){
-        return new AuthData("TODOAUTHTOKEN", user.username());
+        this.authToken = TEMPAUTHTOKEN;
+        return new AuthData(TEMPAUTHTOKEN, user.username());
     }
     public void logout(){
 
