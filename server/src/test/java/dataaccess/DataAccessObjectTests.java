@@ -39,80 +39,80 @@ public class DataAccessObjectTests {
     }
 
     @Test
-    void addUserSuccess() throws DataAccessException {
+    void addUserSuccess() {
         Assertions.assertDoesNotThrow(() -> userDAO.addUser(new UserData("newUser", "newPass", "newEmail")));
     }
 
     @Test
-    void addUserFailure() throws DataAccessException {
+    void addUserFailure() {
         Assertions.assertThrows(DataAccessException.class, () -> userDAO.addUser(null));
     }
 
     @Test
-    void getUserSuccess() throws DataAccessException {
+    void getUserSuccess() {
         Assertions.assertDoesNotThrow(() -> userDAO.getUser("existingUser"));
     }
 
     @Test
     void getUserFailure() throws DataAccessException {
         UserData foundUser = userDAO.getUser("newUser");
-        Assertions.assertEquals(null, foundUser);
+        Assertions.assertNull(foundUser);
     }
 
     @Test
-    void clearUserSuccess() throws DataAccessException {
+    void clearUserSuccess() {
         Assertions.assertDoesNotThrow(() -> userDAO.clearUsers());
     }
 
     @Test
-    void addAuthSuccess() throws DataAccessException {
+    void addAuthSuccess() {
         Assertions.assertDoesNotThrow(() -> authDAO.addAuth(new AuthData("4N0TH3R-R4ND0M-UU1D-STRING", "existingUser")));
     }
 
     @Test
-    void addAuthFailure() throws DataAccessException {
+    void addAuthFailure() {
         Assertions.assertThrows(DataAccessException.class, () -> authDAO.addAuth(null));
     }
 
     @Test
-    void getAuthSuccess() throws DataAccessException {
+    void getAuthSuccess() {
         Assertions.assertDoesNotThrow(() -> authDAO.getAuth("R4ND0M-UU1D-STRING"));
     }
 
     @Test
     void getAuthFailure() throws DataAccessException {
         AuthData authData = authDAO.getAuth("F4K3-UU1D-STRING");
-        Assertions.assertEquals(null, authData);
+        Assertions.assertNull(authData);
     }
 
     @Test
-    void clearAuthSuccess() throws DataAccessException {
+    void clearAuthSuccess() {
         Assertions.assertDoesNotThrow(() -> authDAO.clearAuths());
     }
 
     @Test
-    void createGameSuccess() throws DataAccessException {
+    void createGameSuccess() {
         Assertions.assertDoesNotThrow(() -> gameDAO.createGame("newGame"));
     }
 
     @Test
-    void createGameFailure() throws DataAccessException {
+    void createGameFailure() {
         Assertions.assertThrows(DataAccessException.class, () -> gameDAO.createGame(null));
     }
 
     @Test
-    void getGameSuccess() throws DataAccessException {
+    void getGameSuccess() {
         Assertions.assertDoesNotThrow(() -> gameDAO.getGame(existingGameID));
     }
 
     @Test
     void getGameFailure() throws DataAccessException {
         GameData gameData = gameDAO.getGame(-1);
-        Assertions.assertEquals(null, gameData);
+        Assertions.assertNull(gameData);
     }
 
     @Test
-    void getAllGamesSuccess() throws DataAccessException {
+    void getAllGamesSuccess() {
         Assertions.assertDoesNotThrow(() -> gameDAO.getAllGames());
     }
 
@@ -124,19 +124,19 @@ public class DataAccessObjectTests {
     }
 
     @Test
-    void updateGameSuccess() throws DataAccessException {
+    void updateGameSuccess() {
         GameData updatedGame = new GameData(existingGameID, "newWhite", existingGame.blackUsername(), existingGame.gameName(), existingGame.game());
         Assertions.assertDoesNotThrow(() -> gameDAO.updateGame(updatedGame));
     }
 
     @Test
-    void updateGameFailure() throws DataAccessException {
+    void updateGameFailure() {
         GameData updatedGame = new GameData(-1, "newWhiteUsername", existingGame.blackUsername(), existingGame.gameName(), existingGame.game());
         Assertions.assertDoesNotThrow(() -> gameDAO.updateGame(updatedGame));
     }
 
     @Test
-    void clearGameSuccess() throws DataAccessException {
+    void clearGameSuccess() {
         Assertions.assertDoesNotThrow(() -> gameDAO.clearGames());
     }
 }

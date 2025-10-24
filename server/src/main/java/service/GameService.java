@@ -3,18 +3,15 @@ package service;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
-import dataaccess.UserDAO;
 import model.AuthData;
 import model.GameData;
 import model.JoinData;
 import model.ListGamesData;
 
 public class GameService {
-    private final UserDAO userDAO;
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
-    public GameService(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
-        this.userDAO = userDAO;
+    public GameService(AuthDAO authDAO, GameDAO gameDAO) {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }

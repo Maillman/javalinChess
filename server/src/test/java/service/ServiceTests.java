@@ -30,7 +30,7 @@ public class ServiceTests {
         AuthDAO authDAO = new MemoryAuthDAO();
         GameDAO gameDAO = new MemoryGameDAO();
         this.userService = new UserService(userDAO, authDAO);
-        this.gameService = new GameService(userDAO, authDAO, gameDAO);
+        this.gameService = new GameService(authDAO, gameDAO);
         this.clearService = new ClearService(userDAO, authDAO, gameDAO);
     }
 
@@ -109,7 +109,7 @@ public class ServiceTests {
     }
 
     @Test
-    void clearSuccess() throws DataAccessException {
+    void clearSuccess() {
         Assertions.assertDoesNotThrow(() -> clearService.clear());
     }
 }

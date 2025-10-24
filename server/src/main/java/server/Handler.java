@@ -1,8 +1,5 @@
 package server;
 
-import com.google.gson.Gson;
-
-import com.google.gson.GsonBuilder;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
@@ -47,7 +44,7 @@ public class Handler {
             gameDAO = new MemoryGameDAO();
         }
         this.userService = new UserService(userDAO, authDAO);
-        this.gameService = new GameService(userDAO, authDAO, gameDAO);
+        this.gameService = new GameService(authDAO, gameDAO);
         this.clearService = new ClearService(userDAO, authDAO, gameDAO);
     }
 
