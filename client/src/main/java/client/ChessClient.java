@@ -5,10 +5,10 @@ import ui.*;
 import java.util.Scanner;
 
 public class ChessClient {
-    private final int port;
+    private final ServerFacade serverFacade;
     private ClientUI currentUI;
     public ChessClient(int port) {
-        this.port = port;
+        this.serverFacade = new ServerFacade("http://localhost:" + port);
         this.currentUI = new PreloginUI();
     }
 
