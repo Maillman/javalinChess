@@ -9,7 +9,7 @@ public class ChessClient {
     private ClientUI currentUI;
     public ChessClient(int port) {
         this.serverFacade = new ServerFacade("http://localhost:" + port);
-        this.currentUI = new PreloginUI();
+        this.currentUI = new PreloginUI(this.serverFacade);
     }
 
     public void run() {

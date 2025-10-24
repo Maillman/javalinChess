@@ -1,6 +1,12 @@
 package ui;
 
-public class GameplayUI implements ClientUI {
+import client.ServerFacade;
+
+public class GameplayUI extends ClientUI {
+    public GameplayUI(ServerFacade serverFacade) {
+        super(serverFacade);
+    }
+
     @Override
     public String eval(String command) {
         return null;
