@@ -54,7 +54,7 @@ public abstract class EqualsTestingUtility<T> {
                 className + ".equals() returned false for equivalent " + itemsPlural);
         for (var different : allDifferent.entrySet()) {
             Assertions.assertNotEquals(original.getValue(), different.getValue(),
-                    className + ".equals() returned true for different " + itemsPlural);
+                    className + ".equals() returned true for different " + itemsPlural + comparedItemsAsString(original, Set.of(different)));
         }
     }
 
@@ -65,7 +65,7 @@ public abstract class EqualsTestingUtility<T> {
                 className + ".hashCode() returned different values for equivalent " + itemsPlural);
         for (var different : allDifferent.entrySet()) {
             Assertions.assertNotEquals(original.getValue().hashCode(), different.getValue().hashCode(),
-                    className + ".hashCode() returned the same value for different " + itemsPlural);
+                    className + ".hashCode() returned the same value for different " + itemsPlural + comparedItemsAsString(original, Set.of(different)));
         }
     }
 
@@ -73,7 +73,9 @@ public abstract class EqualsTestingUtility<T> {
     @DisplayName("Equals & HashCode Testing")
     public void hashSetTest() {
         Set<T> set = new HashSet<>();
+        Set<Map.Entry<String, T>> entries = new HashSet<>();
         set.add(original.getValue());
+        entries.add(original);
 
         // Manually test insertion of original & equal items
         Assertions.assertTrue(set.contains(original.getValue()),
@@ -90,8 +92,9 @@ public abstract class EqualsTestingUtility<T> {
         int expectedSetSize = 1;
         for (var different : allDifferent.entrySet()) {
             Assertions.assertFalse(set.contains(different.getValue()),
-                    "[" + className + "] Different item should not be present in set before insertion");
+                    "[" + className + "] Different item should not be present in set before insertion" + comparedItemsAsString(different, entries));
             set.add(different.getValue());
+            entries.add(different);
             expectedSetSize++;
             Assertions.assertEquals(expectedSetSize, set.size(),
                     "[" + className + "] New item was counted as different during insertion");
@@ -102,9 +105,9 @@ public abstract class EqualsTestingUtility<T> {
     private String comparedItemsAsString(Map.Entry<String, T> itemToCompare, Set<Map.Entry<String, T>> itemsComparedAgainst) {
         return String.format("""
 
-                Expected %s:
+                Comparing %s:
                 %s
-                Should be different from rest.
+                against rest of
                 %s
                 """,
                 itemToCompare.getKey(),
@@ -115,7 +118,7 @@ public abstract class EqualsTestingUtility<T> {
     private String setItemsToString(Set<Map.Entry<String, T>> items) {
         StringBuilder itemsAsString = new StringBuilder();
         for(Map.Entry<String, T> item : items) {
-            itemsAsString.append(item.getKey()).append(":\n").append(item.getValue());
+            itemsAsString.append(item.getKey()).append(":\n").append(item.getValue()).append("\n");
         }
         return itemsAsString.toString();
     }
