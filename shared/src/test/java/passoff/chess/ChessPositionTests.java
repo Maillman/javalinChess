@@ -2,7 +2,6 @@ package passoff.chess;
 
 import chess.ChessPosition;
 
-import java.util.List;
 import java.util.Map;
 
 public class ChessPositionTests extends EqualsTestingUtility<ChessPosition> {
