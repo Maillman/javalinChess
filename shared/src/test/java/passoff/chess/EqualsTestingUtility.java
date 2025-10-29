@@ -5,8 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -22,17 +22,22 @@ import java.util.Set;
 public abstract class EqualsTestingUtility<T> {
     private final String className;
     private final String itemsPlural;
-    private T original;
-    private T equivalent;
-    private Collection<T> allDifferent;
+//    private T original;
+//    private T equivalent;
+//    private Collection<T> allDifferent;
+    private Map.Entry<String, T> original;
+    private Map.Entry<String, T> equivalent;
+    private Map<String, T> allDifferent;
 
     public EqualsTestingUtility(String className, String itemsPlural) {
         this.className = className;
         this.itemsPlural = itemsPlural;
     }
 
-    protected abstract T buildOriginal();
-    protected abstract Collection<T> buildAllDifferent();
+//    protected abstract T buildOriginal();
+    protected abstract Map.Entry<String, T> buildOriginal();
+//    protected abstract Collection<T> buildAllDifferent();
+    protected abstract Map<String, T> buildAllDifferent();
 
 
     @BeforeEach
