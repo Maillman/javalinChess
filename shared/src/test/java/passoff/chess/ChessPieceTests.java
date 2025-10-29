@@ -11,27 +11,28 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-public class ChessPieceTests {
+public class ChessPieceTests extends EqualsTestingUtility<ChessPiece> {
     public ChessPieceTests() {
-//        super("ChessPiece", "pieces");
+        super("ChessPiece", "pieces");
     }
 
-//    @Override
-//    protected ChessPiece buildOriginal() {
-//        return new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
-//    }
-//
-//    @Override
-//    protected Collection<ChessPiece> buildAllDifferent() {
-//        return List.of(
-//                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING),
-//                new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN),
-//                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN),
-//                new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN),
-//                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN)
-//        );
-//    }
+    @Override
+    protected Map.Entry<String, ChessPiece> buildOriginal() {
+        return Map.entry("White King", new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
+    }
+
+    @Override
+    protected Map<String, ChessPiece> buildAllDifferent() {
+        return Map.of(
+                "Black King", new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING),
+                "White Queen", new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN),
+                "Black Queen", new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN),
+                "White Pawn", new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN),
+                "Black Pawn", new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN)
+        );
+    }
 
 
     @Test
