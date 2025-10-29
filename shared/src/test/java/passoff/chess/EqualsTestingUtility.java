@@ -50,10 +50,10 @@ public abstract class EqualsTestingUtility<T> {
     @Test
     @DisplayName("Equals Testing")
     public void equalsTest() {
-        Assertions.assertEquals(original, equivalent,
+        Assertions.assertEquals(original.getValue(), equivalent.getValue(),
                 className + ".equals() returned false for equivalent " + itemsPlural);
-        for (var different : allDifferent) {
-            Assertions.assertNotEquals(original, different,
+        for (var different : allDifferent.entrySet()) {
+            Assertions.assertNotEquals(original.getValue(), different.getValue(),
                     className + ".equals() returned true for different " + itemsPlural);
         }
     }
@@ -61,10 +61,10 @@ public abstract class EqualsTestingUtility<T> {
     @Test
     @DisplayName("HashCode Testing")
     public void hashTest() {
-        Assertions.assertEquals(original.hashCode(), equivalent.hashCode(),
+        Assertions.assertEquals(original.getValue().hashCode(), equivalent.getValue().hashCode(),
                 className + ".hashCode() returned different values for equivalent " + itemsPlural);
-        for (var different : allDifferent) {
-            Assertions.assertNotEquals(original.hashCode(), different.hashCode(),
+        for (var different : allDifferent.entrySet()) {
+            Assertions.assertNotEquals(original.getValue().hashCode(), different.getValue().hashCode(),
                     className + ".hashCode() returned the same value for different " + itemsPlural);
         }
     }
@@ -73,30 +73,51 @@ public abstract class EqualsTestingUtility<T> {
     @DisplayName("Equals & HashCode Testing")
     public void hashSetTest() {
         Set<T> set = new HashSet<>();
-        set.add(original);
+        set.add(original.getValue());
 
         // Manually test insertion of original & equal items
-        Assertions.assertTrue(set.contains(original),
+        Assertions.assertTrue(set.contains(original.getValue()),
                 "[" + className + "] Original item should exist in collection after adding original item");
-        Assertions.assertTrue(set.contains(equivalent),
+        Assertions.assertTrue(set.contains(equivalent.getValue()),
                 "[" + className + "] Equivalent item should exist in collection after only adding original item");
         Assertions.assertEquals(1, set.size(),
                 "[" + className + "] Collection should contain only 1 item after a single insert");
-        set.add(equivalent);
+        set.add(equivalent.getValue());
         Assertions.assertEquals(1, set.size(),
                 "[" + className + "] Collection should still contain only 1 item after adding equivalent item");
 
         // Programmatically test insertion of all different items
         int expectedSetSize = 1;
-        for (var different : allDifferent) {
-            Assertions.assertFalse(set.contains(different),
+        for (var different : allDifferent.entrySet()) {
+            Assertions.assertFalse(set.contains(different.getValue()),
                     "[" + className + "] Different item should not be present in set before insertion");
-            set.add(different);
+            set.add(different.getValue());
             expectedSetSize++;
             Assertions.assertEquals(expectedSetSize, set.size(),
                     "[" + className + "] New item was counted as different during insertion");
         }
 
+    }
+
+    private String comparedItemsAsString(Map.Entry<String, T> itemToCompare, Set<Map.Entry<String, T>> itemsComparedAgainst) {
+        return String.format("""
+
+                Expected %s:
+                %s
+                Should be different from rest.
+                %s
+                """,
+                itemToCompare.getKey(),
+                itemToCompare.getValue(),
+                setItemsToString(itemsComparedAgainst));
+    }
+
+    private String setItemsToString(Set<Map.Entry<String, T>> items) {
+        StringBuilder itemsAsString = new StringBuilder();
+        for(Map.Entry<String, T> item : items) {
+            itemsAsString.append(item.getKey()).append(":\n").append(item.getValue());
+        }
+        return itemsAsString.toString();
     }
 
 }
