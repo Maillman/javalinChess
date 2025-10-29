@@ -1,12 +1,15 @@
 package client;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.JoinData;
 import model.UserData;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 public class ServerFacade {
     private final HTTPCommunicator httpCommunicator = new HTTPCommunicator();
@@ -31,7 +34,9 @@ public class ServerFacade {
 
     }
     public Collection<GameData> listGames(){
-        return new ArrayList<>();
+        return new ArrayList<>(List.of(
+                new GameData(1, null, null, "newGame", new ChessGame())
+        ));
     }
     public JoinData createGame(String gameName){
         return new JoinData(null, 1);

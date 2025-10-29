@@ -3,13 +3,15 @@ package ui;
 import client.ServerFacade;
 import model.GameData;
 
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class PostloginUI extends ClientUI{
     private String username;
+    private Map<Integer, GameData> savedGames;
     public PostloginUI(ServerFacade serverFacade, Scanner scanner, PrintStream out, String username) {
         super(serverFacade, scanner, out);
         this.username = username;
@@ -43,25 +45,41 @@ public class PostloginUI extends ClientUI{
         Collection<GameData> games = serverFacade.listGames();
         StringBuilder listedGames = new StringBuilder();
         int i = 1;
+        savedGames = new HashMap<>();
         for(GameData game : games) {
-            listedGames.append(String.format("%d -> %s - White Player: %s, Black Player: %s",i,game.gameName(),game.whiteUsername(),game.blackUsername()));
+            listedGames.append(String.format("%d -> %s - White Player: %s, Black Player: %s\n",i,game.gameName(),game.whiteUsername(),game.blackUsername()));
+            savedGames.put(i, game);
             i++;
         }
         if(listedGames.isEmpty()){
             listedGames.append("No games to be list");
         }
-        return listedGames;
+        return listedGames.toString();
     }
 
     private Object create(){
         out.println("What's the game name?");
         String gameName = scanner.nextLine();
         serverFacade.createGame(gameName);
-        return "game created!";
+        return gameName + " created!";
     }
 
     private Object join(){
-        return null;
+        out.println("What game do you want to join?");
+        String gameIndex = scanner.nextLine();
+        GameData game;
+        try {
+            game = savedGames.get(Integer.parseInt(gameIndex));
+        }catch(NumberFormatException e){
+            return "That is not a correct index (please put in an integer)";
+        }
+        if(game==null){
+            return "No game found at that index";
+        }
+        out.println("What color do you want to join as?");
+        String color = scanner.nextLine();
+        serverFacade.joinGame(color, game.gameID());
+        return new GameplayUI(this.serverFacade, this.scanner, this.out);
     }
 
     private Object logout(){
