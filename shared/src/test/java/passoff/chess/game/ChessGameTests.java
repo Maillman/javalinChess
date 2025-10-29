@@ -9,6 +9,8 @@ import passoff.chess.TestUtilities;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ChessGameTests extends EqualsTestingUtility<ChessGame> {
     public ChessGameTests() {
@@ -16,37 +18,33 @@ public class ChessGameTests extends EqualsTestingUtility<ChessGame> {
     }
 
     @Override
-    protected ChessGame buildOriginal() {
-        return new ChessGame();
+    protected Map.Entry<String, ChessGame> buildOriginal() {
+        return Map.entry("Default board", new ChessGame());
     }
 
     @Override
-    protected Collection<ChessGame> buildAllDifferent() {
-        Collection<ChessGame> differentGames = new ArrayList<>();
+    protected Map<String, ChessGame> buildAllDifferent() {
+        Map<String, ChessGame> differentGames = new HashMap<>();
 
         try {
-            // Different team turn
             ChessGame game1 = new ChessGame();
             game1.setTeamTurn(ChessGame.TeamColor.BLACK);
-            differentGames.add(game1);
+            differentGames.put("Different team turn", game1);
 
-            // Move pawn
             ChessGame game2 = new ChessGame();
             game2.makeMove(new ChessMove(
                     new ChessPosition(2, 5),
                     new ChessPosition(4, 5),
                     null));
-            differentGames.add(game2);
+            differentGames.put("Moved pawn", game2);
 
-            // Move knight
             ChessGame game3 = new ChessGame();
             game3.makeMove(new ChessMove(
                     new ChessPosition(1, 7),
                     new ChessPosition(3, 6),
                     null));
-            differentGames.add(game3);
+            differentGames.put("Moved knight", game3);
 
-            // Set board
             ChessGame game4 = new ChessGame();
             game4.setBoard(TestUtilities.loadBoard("""
                     | | | |R| | | | |
@@ -58,7 +56,7 @@ public class ChessGameTests extends EqualsTestingUtility<ChessGame> {
                     | | | | |P| | | |
                     | | | |R| | | | |
                     """));
-            differentGames.add(game4);
+            differentGames.put("Preset board", game4);
 
         } catch (InvalidMoveException e) {
             throw new RuntimeException("All moves in ChessGameTests are valid and should be allowed.", e);
