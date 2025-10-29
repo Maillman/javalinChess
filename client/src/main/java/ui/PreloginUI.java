@@ -40,7 +40,8 @@ public class PreloginUI extends ClientUI{
             out.println("What's your email?");
             email = scanner.nextLine();
         }
-        AuthData authData = serverFacade.register(new UserData(username, password, email));
+        UserData userData = new UserData(username, password, email);
+        AuthData authData = isLogin ? serverFacade.login(userData) : serverFacade.register(userData);
         out.println(isLogin ? "Logged in!" : "Registered!");
         return new PostloginUI(this.serverFacade, this.scanner, this.out, authData.username());
     }
