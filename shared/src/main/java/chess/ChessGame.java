@@ -25,7 +25,7 @@ public class ChessGame {
 
     public ChessGame() {
         this.board = new ChessBoard();
-        //this.board.resetBoard();
+        this.board.resetBoard();
         this.teamTurn = TeamColor.WHITE;
         this.wqCastle = true;
         this.wkCastle = true;
@@ -228,30 +228,30 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-//        ChessPiece piece = board.getPiece(move.getStartPosition());
-//        if (piece == null) {
-//            throw new InvalidMoveException("No piece there");
-//        }
-//        TeamColor colorOfPiece = piece.getTeamColor();
-//        if (colorOfPiece != this.teamTurn) {
-//            throw new InvalidMoveException("Piece moved out of turn");
-//        }
-//        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
-//        if (!validMoves.contains(move)) {
-//            throw new InvalidMoveException("Piece can't go there");
-//        }
-//        movePiece(move);
-//        this.prevMove = move;
-//        switch (teamTurn) {
-//            case WHITE:
-//                this.teamTurn = TeamColor.BLACK;
-//                break;
-//            case BLACK:
-//                this.teamTurn = TeamColor.WHITE;
-//                break;
-//            default:
-//                this.teamTurn = TeamColor.WHITE;
-//        }
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (piece == null) {
+            throw new InvalidMoveException("No piece there");
+        }
+        TeamColor colorOfPiece = piece.getTeamColor();
+        if (colorOfPiece != this.teamTurn) {
+            throw new InvalidMoveException("Piece moved out of turn");
+        }
+        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+        if (!validMoves.contains(move)) {
+            throw new InvalidMoveException("Piece can't go there");
+        }
+        movePiece(move);
+        this.prevMove = move;
+        switch (teamTurn) {
+            case WHITE:
+                this.teamTurn = TeamColor.BLACK;
+                break;
+            case BLACK:
+                this.teamTurn = TeamColor.WHITE;
+                break;
+            default:
+                this.teamTurn = TeamColor.WHITE;
+        }
     }
 
     private void movePiece(ChessMove move) {
