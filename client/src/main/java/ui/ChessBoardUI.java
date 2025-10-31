@@ -29,7 +29,7 @@ public class ChessBoardUI {
                     if(j == 0) {
                         out.print("   ");
                     }
-                    out.print(" " + LETTERS[j] + " ");
+                    out.print(" " + LETTERS[perspective != GameplayUI.gameplayState.BLACK ? j : 7 - j] + " ");
                     if(j == 7) {
                         out.print("   ");
                     }
@@ -74,7 +74,7 @@ public class ChessBoardUI {
                     if(j == 0) {
                         out.print("   ");
                     }
-                    out.print(" " + LETTERS[j] + " ");
+                    out.print(" " + LETTERS[perspective != GameplayUI.gameplayState.BLACK ? j : 7 - j] + " ");
                     if(j == 7) {
                         out.print("   ");
                     }

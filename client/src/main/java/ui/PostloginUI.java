@@ -93,7 +93,9 @@ public class PostloginUI extends ClientUI{
                 serverFacade.joinGame(color.get(), game.gameID());
             }
             out.printf("%s the game!", isJoin ? "Joined" : "Observing");
-            return new GameplayUI(this.serverFacade, this.scanner, this.out, this.username, color.get());
+            GameplayUI gamePlayUI = new GameplayUI(this.serverFacade, this.scanner, this.out, this.username, color.get());
+            gamePlayUI.eval("redraw");
+            return gamePlayUI;
         });
 
     }

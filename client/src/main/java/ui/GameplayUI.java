@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import client.ServerFacade;
 
 import java.io.PrintStream;
@@ -26,6 +27,9 @@ public class GameplayUI extends ClientUI {
     @Override
     public Object eval(String command) {
         switch (command.toLowerCase()){
+            case "redraw" -> {
+                return redraw();
+            }
             case "leave" -> {
                 return leave();
             }
@@ -42,6 +46,12 @@ public class GameplayUI extends ClientUI {
         }
     }
 
+    private Object redraw() {
+        this.out.println(EscapeSequences.RESET_TEXT_COLOR);
+        ChessBoardUI.drawChessBoard(this.out, new ChessGame(), this.currentGameplayState, null);
+        return null;
+    }
+
     private Object leave() {
         out.println("Leaving the game!");
         return new PostloginUI(this.serverFacade, this.scanner, this.out, this.username);
@@ -50,6 +60,7 @@ public class GameplayUI extends ClientUI {
     @Override
     public String help() {
         return """
+                redraw - Redraw the current board
                 leave - Leave the game
                 help - Run this help menu
                 quit - Quit this application""";
