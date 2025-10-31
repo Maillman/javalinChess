@@ -12,14 +12,15 @@ import java.util.Collection;
 import java.util.List;
 
 public class ServerFacade {
-    private final HTTPCommunicator httpCommunicator = new HTTPCommunicator();
-    private final String serverUrl;
+    private final HTTPCommunicator httpCommunicator;
+//    private final String serverUrl;
     private String authToken = null;
     //TODO: Remove when fully working with server
     private static final String TEMPAUTHTOKEN = "TEMPAUTHTOKEN";
 
     public ServerFacade(String url) {
-        this.serverUrl = url;
+//        this.serverUrl = url;
+        this.httpCommunicator = new HTTPCommunicator(url);
     }
 
     public AuthData register(UserData user){
