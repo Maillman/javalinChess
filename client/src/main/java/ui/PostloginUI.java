@@ -27,7 +27,10 @@ public class PostloginUI extends ClientUI{
                 return create();
             }
             case "join" -> {
-                return join();
+                return joinObserve(true);
+            }
+            case "observe" -> {
+                return joinObserve(false);
             }
             case "logout" -> {
                 return logout();
@@ -64,8 +67,8 @@ public class PostloginUI extends ClientUI{
         return gameName + " created!";
     }
 
-    private Object join(){
-        out.println("What game do you want to join?");
+    private Object joinObserve(boolean isJoin){
+        out.printf("What game do you want to %s?\n", isJoin ? "play" : "observe");
         String gameIndex = scanner.nextLine();
         GameData game;
         try {
@@ -76,10 +79,14 @@ public class PostloginUI extends ClientUI{
         if(game==null){
             return "No game found at that index";
         }
-        out.println("What color do you want to join as?");
-        String color = scanner.nextLine();
-        serverFacade.joinGame(color, game.gameID());
-        return new GameplayUI(this.serverFacade, this.scanner, this.out);
+        String color = "OBSERVE";
+        if(isJoin) {
+            out.println("What color do you want to join as (WHITE|BLACK)?");
+            color = scanner.nextLine();
+            serverFacade.joinGame(color, game.gameID());
+        }
+        out.printf("%s the game!", isJoin ? "Joined" : "Observing");
+        return new GameplayUI(this.serverFacade, this.scanner, this.out, this.username, color);
     }
 
     private Object logout(){
@@ -93,6 +100,7 @@ public class PostloginUI extends ClientUI{
                 list - List all games from server
                 create - Create a new chess game
                 join - Join a created game
+                observe - Observe a created game
                 logout - Log out as user
                 help - Run this help menu
                 quit - Quit this application""";
