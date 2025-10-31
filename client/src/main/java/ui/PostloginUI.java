@@ -53,7 +53,9 @@ public class PostloginUI extends ClientUI{
             int i = 1;
             savedGames = new HashMap<>();
             for(GameData game : games.games()) {
-                listedGames.append(String.format("%d -> %s - White Player: %s, Black Player: %s\n",i,game.gameName(),game.whiteUsername(),game.blackUsername()));
+                String whiteUsername = game.whiteUsername() == null ? "(Available)" : game.whiteUsername();
+                String blackUsername = game.blackUsername() == null ? "(Available)" : game.blackUsername();
+                listedGames.append(String.format("%d -> %s - White Player: %s, Black Player: %s\n",i,game.gameName(), whiteUsername, blackUsername));
                 savedGames.put(i, game);
                 i++;
             }

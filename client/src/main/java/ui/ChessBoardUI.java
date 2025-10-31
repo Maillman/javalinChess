@@ -16,7 +16,6 @@ public class ChessBoardUI {
     public static void main(String[] args) {
         drawChessBoard(System.out, new ChessGame(), GameplayUI.gameplayState.WHITE, null);
         drawChessBoard(System.out, new ChessGame(), GameplayUI.gameplayState.BLACK, null);
-
         drawChessBoard(System.out, new ChessGame(), GameplayUI.gameplayState.OBSERVER, null);
     }
 
