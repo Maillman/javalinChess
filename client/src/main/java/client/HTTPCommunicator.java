@@ -2,6 +2,7 @@ package client;
 
 import com.google.gson.Gson;
 
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -15,7 +16,8 @@ public class HTTPCommunicator {
     public HTTPCommunicator(String url){
         this.serverUrl = url;
     }
-    public <T> T makeRequest(String method, String path, Object body, String authToken, Class<T> responseClass) {
+    public <T> T makeRequest(String method, String path, Object body, String authToken, Class<T> responseClass)
+            throws ResponseException {
         var request = HttpRequest.newBuilder(URI.create(this.serverUrl + path))
                 .method(method, makeRequestBody(body));
         if(body != null) {
@@ -35,12 +37,14 @@ public class HTTPCommunicator {
         }
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest request) {
+    private HttpResponse<String> sendRequest(HttpRequest request) throws ResponseException {
         try {
-            client.send(request, HttpResponse.BodyHandlers.ofString());
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception ex) {
-            //TODO: DO SOMETHING ELSE
-            System.out.println("Something went wrong with the request: " + ex.getMessage());
+            if(ex instanceof ConnectException){
+                throw new ResponseException("Error connecting to the server. Server may not be running");
+            }
+            throw new ResponseException("Something went wrong with the request: " + ex.getMessage());
         }
     }
 
@@ -51,7 +55,13 @@ public class HTTPCommunicator {
             if(body != null) {
                 throw ResponseException.fromJson(body);
             }
+            throw new ResponseException("Server responded with an error. Status Code: " + status);
         }
+        if (responseClass != null) {
+            return new Gson().fromJson(response.body(), responseClass);
+        }
+
+        return null;
     }
 
     private boolean isSuccessful(int status) {

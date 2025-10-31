@@ -30,6 +30,10 @@ public class GameplayUI extends ClientUI {
                 return leave();
             }
             case "quit" -> {
+                Object result = leave();
+                if(result instanceof ClientUI) {
+                    return ((ClientUI) result).eval("quit");
+                }
                 return "quit";
             }
             default -> {

@@ -1,48 +1,44 @@
 package client;
 
 import chess.ChessGame;
-import model.AuthData;
-import model.GameData;
-import model.JoinData;
-import model.UserData;
+import model.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class ServerFacade {
     private final HTTPCommunicator httpCommunicator;
 //    private final String serverUrl;
     private String authToken = null;
     //TODO: Remove when fully working with server
-    private static final String TEMPAUTHTOKEN = "TEMPAUTHTOKEN";
+//    private static final String TEMPAUTHTOKEN = "TEMPAUTHTOKEN";
 
     public ServerFacade(String url) {
 //        this.serverUrl = url;
         this.httpCommunicator = new HTTPCommunicator(url);
     }
 
-    public AuthData register(UserData user){
-        this.authToken = TEMPAUTHTOKEN;
-        return new AuthData(TEMPAUTHTOKEN, user.username());
+    public AuthData register(UserData user) throws ResponseException {
+        AuthData authData = httpCommunicator.makeRequest("POST", "/user", user, null, AuthData.class);
+        this.authToken = authData.authToken();
+        return authData;
     }
-    public AuthData login(UserData user){
-        this.authToken = TEMPAUTHTOKEN;
-        return new AuthData(TEMPAUTHTOKEN, user.username());
+    public AuthData login(UserData user) throws ResponseException {
+        AuthData authData = httpCommunicator.makeRequest("POST", "/session", user, null, AuthData.class);
+        this.authToken = authData.authToken();
+        return authData;
     }
-    public void logout(){
-
+    public void logout() throws ResponseException {
+        httpCommunicator.makeRequest("DELETE", "/session", null, authToken, null);
+        this.authToken = null;
     }
-    public Collection<GameData> listGames(){
-        return new ArrayList<>(List.of(
-                new GameData(1, null, null, "newGame", new ChessGame())
-        ));
+    public ListGamesData listGames() throws ResponseException {
+        return httpCommunicator.makeRequest("GET", "/game", null, authToken, ListGamesData.class);
     }
-    public JoinData createGame(String gameName){
-        return new JoinData(null, 1);
+    public JoinData createGame(String gameName) throws ResponseException {
+        return httpCommunicator.makeRequest("POST", "/game", Map.of("gameName", gameName), authToken, JoinData.class);
     }
-    public void joinGame(String playerColor, int gameID){
-
+    public void joinGame(String playerColor, int gameID) throws ResponseException {
+        JoinData joinData = new JoinData(playerColor, gameID);
+        httpCommunicator.makeRequest("PUT", "/game", joinData, authToken, null);
     }
 }

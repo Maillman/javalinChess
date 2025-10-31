@@ -25,11 +25,11 @@ public class ChessClient {
 
             try {
                 result = currentUI.eval(line);
-                if(result instanceof ClientUI){
-                    this.currentUI = (ClientUI) result;
-                }
-                else if(result instanceof String) {
-                    System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
+                switch (result) {
+                    case ClientUI clientUI -> this.currentUI = clientUI;
+                    case String ignored -> System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
+                    case null -> result = "";
+                    default -> throw new RuntimeException("Received unknown result");
                 }
             } catch (Throwable e) {
                 var msg = e.toString();

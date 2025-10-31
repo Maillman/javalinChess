@@ -1,5 +1,6 @@
 package ui;
 
+import client.ResponseException;
 import client.ServerFacade;
 
 import java.io.PrintStream;
@@ -18,4 +19,18 @@ public abstract class ClientUI {
     abstract public Object eval(String command);
     abstract public String help();
     abstract public String currentState();
+
+    protected <T> T handleServerOperation(ServerCall<T> serverCall) {
+        try {
+            return serverCall.execute();
+        }catch(ResponseException ex){
+            out.println(EscapeSequences.SET_TEXT_COLOR_RED + ex.getMessage());
+            return null;
+        }
+    }
+
+    @FunctionalInterface
+    protected interface ServerCall<T> {
+        T execute() throws ResponseException;
+    }
 }
