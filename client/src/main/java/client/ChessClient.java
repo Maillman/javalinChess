@@ -14,6 +14,12 @@ public class ChessClient {
         this.currentUI = new PreloginUI(this.serverFacade, this.scanner, System.out);
     }
 
+    public ChessClient(String url) {
+        this.serverFacade = new ServerFacade(url);
+        this.scanner = new Scanner(System.in);
+        this.currentUI = new PreloginUI(this.serverFacade, this.scanner, System.out);
+    }
+
     public void run() {
         System.out.println("Are you ready to play a game of chess? Sign in to start.");
         System.out.print(currentUI.help());
