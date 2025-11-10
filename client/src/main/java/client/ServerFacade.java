@@ -1,19 +1,14 @@
 package client;
 
-import chess.ChessGame;
 import model.*;
 
 import java.util.*;
 
 public class ServerFacade {
     private final HTTPCommunicator httpCommunicator;
-//    private final String serverUrl;
     private String authToken = null;
-    //TODO: Remove when fully working with server
-//    private static final String TEMPAUTHTOKEN = "TEMPAUTHTOKEN";
 
     public ServerFacade(String url) {
-//        this.serverUrl = url;
         this.httpCommunicator = new HTTPCommunicator(url);
     }
 
@@ -40,5 +35,8 @@ public class ServerFacade {
     public void joinGame(String playerColor, int gameID) throws ResponseException {
         JoinData joinData = new JoinData(playerColor, gameID);
         httpCommunicator.makeRequest("PUT", "/game", joinData, authToken, null);
+    }
+    public void clear() throws ResponseException {
+        httpCommunicator.makeRequest("DELETE", "/db", null, null, null);
     }
 }
