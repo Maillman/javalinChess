@@ -8,8 +8,8 @@ import java.util.Scanner;
 
 public class GameplayUI extends ClientUI {
     private String username;
-    private gameplayState currentGameplayState;
-    public enum gameplayState {
+    private GameplayState currentGameplayState;
+    public enum GameplayState {
         WHITE,
         BLACK,
         OBSERVER
@@ -18,9 +18,9 @@ public class GameplayUI extends ClientUI {
         super(serverFacade, scanner, out);
         this.username = username;
         switch(state) {
-            case "WHITE" -> this.currentGameplayState = gameplayState.WHITE;
-            case "BLACK" -> this.currentGameplayState = gameplayState.BLACK;
-            default -> this.currentGameplayState = gameplayState.OBSERVER;
+            case "WHITE" -> this.currentGameplayState = GameplayState.WHITE;
+            case "BLACK" -> this.currentGameplayState = GameplayState.BLACK;
+            default -> this.currentGameplayState = GameplayState.OBSERVER;
         }
     }
 
@@ -68,7 +68,7 @@ public class GameplayUI extends ClientUI {
 
     @Override
     public String currentState() {
-        if(this.currentGameplayState==gameplayState.OBSERVER) {
+        if(this.currentGameplayState== GameplayState.OBSERVER) {
             return "[Observing the game]";
         } else {
             return "[Playing game as " + this.currentGameplayState.name() + "]";

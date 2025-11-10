@@ -14,34 +14,21 @@ public class ChessBoardUI {
     private static final String[] LETTERS = new String[]{"a","b","c","d","e","f","g","h"};
 
     public static void main(String[] args) {
-        drawChessBoard(System.out, new ChessGame(), GameplayUI.gameplayState.WHITE, null);
-        drawChessBoard(System.out, new ChessGame(), GameplayUI.gameplayState.BLACK, null);
-        drawChessBoard(System.out, new ChessGame(), GameplayUI.gameplayState.OBSERVER, null);
+        drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.WHITE, null);
+        drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.BLACK, null);
+        drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.OBSERVER, null);
     }
 
-    public static void drawChessBoard(PrintStream out, ChessGame theGame, GameplayUI.gameplayState perspective, ChessPosition position) {
+    public static void drawChessBoard(PrintStream out, ChessGame theGame, GameplayUI.GameplayState perspective, ChessPosition position) {
         //TODO: Do something w/ position in the future!
         ChessBoard board = theGame.getBoard();
         for(int row = 0; row < BOARD_SIZE_IN_SQUARES; row++) {
             if(row == 0) {
-                for(int j = 0; j < BOARD_SIZE_IN_SQUARES; j++) {
-                    if(j == 0) {
-                        out.print("   ");
-                    }
-                    out.print(" " + LETTERS[perspective != GameplayUI.gameplayState.BLACK ? j : 7 - j] + " ");
-                    if(j == 7) {
-                        out.print("   ");
-                    }
-                }
-                out.print("\n");
+                printColumnLetters(out, perspective);
             }
             for(int col = 0; col < BOARD_SIZE_IN_SQUARES; col++) {
                 if(col == 0){
-                    if (perspective != GameplayUI.gameplayState.BLACK) {
-                        out.print(" " + (9 - (row + 1)) + " ");
-                    } else {
-                        out.print(" " + (row + 1) + " ");
-                    }
+                    printRowNumber(out, perspective, row);
                 }
                 if((row + col) % 2 == 1){
                     out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
@@ -50,37 +37,44 @@ public class ChessBoardUI {
                 }
                 out.print(' ');
                 ChessPiece curPiece;
-                if(perspective != GameplayUI.gameplayState.BLACK) {
+                if(perspective != GameplayUI.GameplayState.BLACK) {
                     curPiece = board.getPiece(new ChessPosition(9 - (row + 1), col + 1));
                 } else {
                     curPiece = board.getPiece(new ChessPosition(row + 1, 9 - (col + 1)));
                 }
-                String printPiece = getString(curPiece);
-                out.print(printPiece);
+                out.print(getString(curPiece));
                 out.print(' ');
                 if(col == 7){
                     out.print(EscapeSequences.RESET_BG_COLOR);
-                    if (perspective != GameplayUI.gameplayState.BLACK) {
-                        out.print(" " + (9 - (row + 1)) + " ");
-                    } else {
-                        out.print(" " + (row + 1) + " ");
-                    }
+                    printRowNumber(out, perspective, row);
                 }
             }
             out.print("\n");
             if(row == 7) {
-                for(int j = 0; j < BOARD_SIZE_IN_SQUARES; j++) {
-                    if(j == 0) {
-                        out.print("   ");
-                    }
-                    out.print(" " + LETTERS[perspective != GameplayUI.gameplayState.BLACK ? j : 7 - j] + " ");
-                    if(j == 7) {
-                        out.print("   ");
-                    }
-                }
-                out.print("\n");
+                printColumnLetters(out, perspective);
             }
         }
+    }
+
+    private static void printRowNumber(PrintStream out, GameplayUI.GameplayState perspective, int row) {
+        if (perspective != GameplayUI.GameplayState.BLACK) {
+            out.print(" " + (9 - (row + 1)) + " ");
+        } else {
+            out.print(" " + (row + 1) + " ");
+        }
+    }
+
+    private static void printColumnLetters(PrintStream out, GameplayUI.GameplayState perspective) {
+        for(int j = 0; j < BOARD_SIZE_IN_SQUARES; j++) {
+            if(j == 0) {
+                out.print("   ");
+            }
+            out.print(" " + LETTERS[perspective != GameplayUI.GameplayState.BLACK ? j : 7 - j] + " ");
+            if(j == 7) {
+                out.print("   ");
+            }
+        }
+        out.print("\n");
     }
 
     private static String getString(ChessPiece curPiece) {
