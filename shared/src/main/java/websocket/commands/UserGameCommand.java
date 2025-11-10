@@ -1,5 +1,8 @@
 package websocket.commands;
 
+import com.google.gson.*;
+
+import java.lang.reflect.Type;
 import java.util.Objects;
 
 /**
@@ -57,5 +60,23 @@ public class UserGameCommand {
     @Override
     public int hashCode() {
         return Objects.hash(getCommandType(), getAuthToken(), getGameID());
+    }
+
+    public static class UserGameCommandAdapter implements JsonDeserializer<UserGameCommand> {
+
+        @Override
+        public UserGameCommand deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext ctx) throws JsonParseException {
+            UserGameCommand userGameCommand = null;
+            if (jsonElement.isJsonObject()) {
+                String commandType = jsonElement.getAsJsonObject().get("commandType").getAsString();
+                switch(CommandType.valueOf(commandType)) {
+                    case CONNECT -> userGameCommand = ctx.deserialize(jsonElement, ConnectCommand.class);
+                    case MAKE_MOVE -> userGameCommand = ctx.deserialize(jsonElement, MakeMoveCommand.class);
+                    case LEAVE -> userGameCommand = ctx.deserialize(jsonElement, UserGameCommand.class);
+                    case RESIGN -> userGameCommand = ctx.deserialize(jsonElement, ResignCommand.class);
+                }
+            }
+            return userGameCommand;
+        }
     }
 }

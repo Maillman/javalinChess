@@ -1,5 +1,11 @@
 package websocket.messages;
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+
+import java.lang.reflect.Type;
 import java.util.Objects;
 
 /**
@@ -39,5 +45,22 @@ public class ServerMessage {
     @Override
     public int hashCode() {
         return Objects.hash(getServerMessageType());
+    }
+
+    public static class ServerMessageAdapter implements JsonDeserializer<ServerMessage> {
+
+        @Override
+        public ServerMessage deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext ctx) throws JsonParseException {
+            ServerMessage serverMessage = null;
+            if (jsonElement.isJsonObject()) {
+                String serverMessageType = jsonElement.getAsJsonObject().get("commandType").getAsString();
+                switch(ServerMessage.ServerMessageType.valueOf(serverMessageType)) {
+                    case LOAD_GAME -> serverMessage = ctx.deserialize(jsonElement, LoadGameMessage.class);
+                    case ERROR -> serverMessage = ctx.deserialize(jsonElement, ErrorMessage.class);
+                    case NOTIFICATION -> serverMessage = ctx.deserialize(jsonElement, NotificationMessage.class);
+                }
+            }
+            return serverMessage;
+        }
     }
 }
