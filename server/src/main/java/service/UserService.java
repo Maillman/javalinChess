@@ -83,4 +83,8 @@ public class UserService {
         String authToken = UUID.randomUUID().toString();
         return new AuthData(authToken, username);
     }
+
+    public String getUsername(String authToken) throws DataAccessException {
+        return authDAO.getAuth(authToken).username();
+    }
 }

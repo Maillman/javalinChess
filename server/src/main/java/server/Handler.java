@@ -28,24 +28,10 @@ public class Handler {
     private final GameService gameService;
     private final ClearService clearService;
 
-    public Handler() {
-        UserDAO userDAO;
-        AuthDAO authDAO;
-        GameDAO gameDAO;
-        try {
-            DatabaseManager.createDatabase();
-            userDAO = new SQLUserDAO();
-            authDAO = new SQLAuthDAO();
-            gameDAO = new SQLGameDAO();
-        } catch (DataAccessException e) {
-            System.out.println("An error occurred starting the database:" + e);
-            userDAO = new MemoryUserDAO();
-            authDAO = new MemoryAuthDAO();
-            gameDAO = new MemoryGameDAO();
-        }
-        this.userService = new UserService(userDAO, authDAO);
-        this.gameService = new GameService(authDAO, gameDAO);
-        this.clearService = new ClearService(userDAO, authDAO, gameDAO);
+    public Handler(UserService userService, GameService gameService, ClearService clearService) {
+        this.userService = userService;
+        this.gameService = gameService;
+        this.clearService = clearService;
     }
 
     public void register(Context ctx) throws DataAccessException {
