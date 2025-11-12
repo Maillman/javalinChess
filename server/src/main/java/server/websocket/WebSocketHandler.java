@@ -152,16 +152,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private NotificationMessage handleResignation(String username, GameData game) throws DataAccessException {
+        ChessGame chessGame = game.game();
+        if(chessGame.isOver()) {
+            throw new DataAccessException("Error: The game is already over.");
+        }
         String opposingPlayer;
         if(username.equals(game.whiteUsername())) {
             opposingPlayer = game.blackUsername();
         } else if(username.equals(game.blackUsername())) {
             opposingPlayer = game.whiteUsername();
         } else {
-            throw new DataAccessException("You are not a player, you cannot resign.");
+            throw new DataAccessException("Error: You are not a player, you cannot resign.");
         }
         String notification = String.format("%s has resigned from the game. %s wins!", username, opposingPlayer);
-        ChessGame chessGame = game.game();
         chessGame.setOver(true);
         GameData updatedGame = GameData.updateGameInGameData(game, chessGame);
         gameService.updateGame(updatedGame);

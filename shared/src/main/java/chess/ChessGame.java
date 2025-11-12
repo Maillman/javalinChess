@@ -236,19 +236,19 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if(isOver()) {
-            throw new InvalidMoveException("Game is over");
+            throw new InvalidMoveException("Error: Game is over");
         }
         ChessPiece piece = board.getPiece(move.getStartPosition());
         if (piece == null) {
-            throw new InvalidMoveException("No piece there");
+            throw new InvalidMoveException("Error: No piece there");
         }
         TeamColor colorOfPiece = piece.getTeamColor();
         if (colorOfPiece != this.teamTurn) {
-            throw new InvalidMoveException("Piece moved out of turn");
+            throw new InvalidMoveException("Error: Piece moved out of turn");
         }
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         if (!validMoves.contains(move)) {
-            throw new InvalidMoveException("Piece can't go there");
+            throw new InvalidMoveException("Error: Piece can't go there");
         }
         movePiece(move);
         this.prevMove = move;
