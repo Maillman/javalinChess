@@ -54,7 +54,7 @@ public class GameService {
             }
             default -> throw new DataAccessException("Error: invalid player color", 400);
         }
-        this.gameDAO.updateGame(updatedGame);
+        updateGame(updatedGame);
     }
 
     public AuthData verifyUser(String authToken) throws DataAccessException {
@@ -71,5 +71,9 @@ public class GameService {
             throw new DataAccessException("Error: game doesn't exist", 400);
         }
         return game;
+    }
+
+    public void updateGame(GameData updatedGame) throws DataAccessException {
+        this.gameDAO.updateGame(updatedGame);
     }
 }

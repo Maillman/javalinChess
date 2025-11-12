@@ -85,6 +85,10 @@ public class UserService {
     }
 
     public String getUsername(String authToken) throws DataAccessException {
-        return authDAO.getAuth(authToken).username();
+        AuthData authData = authDAO.getAuth(authToken);
+        if(authData==null) {
+            throw new DataAccessException("Error: Invalid authtoken", 401);
+        }
+        return authData.username();
     }
 }

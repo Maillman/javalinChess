@@ -1,5 +1,9 @@
 package server.websocket;
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
@@ -73,8 +77,35 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void handleMakeMoveCommand(MakeMoveCommand command, Session session) {
+    private void handleMakeMoveCommand(MakeMoveCommand command, Session session) throws DataAccessException, InvalidMoveException, IOException {
+        String username = userService.getUsername(command.getAuthToken());
+        GameData game = gameService.getGame(command.getGameID());
+        ChessMove move = command.getMove();
+        ChessGame updatedChessGame = handleMoveForPlayer(username, game, move);
+        LoadGameMessage loadGameMessage = new LoadGameMessage(updatedChessGame);
+        connectionManager.broadcastAll(game.gameID(), loadGameMessage);
+        ChessPosition startPos = move.getStartPosition();
+        ChessPosition endPos = move.getEndPosition();
+        String notification = String.format("%s has moved %s from %s to %s", username, updatedChessGame.getBoard().getPiece(endPos), ChessPosition.algebraicNotation(startPos), ChessPosition.algebraicNotation(endPos));
+        NotificationMessage notificationMessage = new NotificationMessage(notification);
+        connectionManager.broadcastOthers(command.getAuthToken(), command.getGameID(), notificationMessage);
+        //TODO: Handle logic for check/checkmate/stalemate notification
+    }
 
+    private ChessGame handleMoveForPlayer(String username, GameData game, ChessMove move) throws InvalidMoveException, DataAccessException {
+        ChessGame chessGame = game.game();
+        ChessGame.TeamColor teamTurn = chessGame.getTeamTurn();
+        if(username.equals(game.whiteUsername()) && teamTurn == ChessGame.TeamColor.WHITE ||
+                username.equals(game.blackUsername()) && teamTurn == ChessGame.TeamColor.BLACK
+        ) {
+            chessGame.makeMove(move);
+        } else {
+            throw new InvalidMoveException("Not your piece to move");
+        }
+//        chessGame.makeMove(move);
+        GameData updatedGame = GameData.updateGameInGameData(game, chessGame);
+        gameService.updateGame(updatedGame);
+        return chessGame;
     }
 
     private void handleLeaveCommand(LeaveCommand command, Session session) {
@@ -85,7 +116,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    public void handleException(DataAccessException e, WsContext ctx) {
+    public void handleException(Exception e, WsContext ctx) {
         try {
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
             connectionManager.displayToSession(ctx.session, errorMessage);

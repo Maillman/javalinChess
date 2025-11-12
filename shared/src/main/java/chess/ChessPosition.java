@@ -65,4 +65,11 @@ public class ChessPosition {
         sb.append(')');
         return sb.toString();
     }
+
+
+    public static String algebraicNotation(ChessPosition chessPosition) {
+        String[] rows = new String[]{"a", "b", "c", "d", "e", "f", "g", "h"};
+        String row = rows[chessPosition.getRow()];
+        return row + chessPosition.getColumn();
+    }
 }
