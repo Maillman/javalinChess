@@ -69,7 +69,7 @@ public class ChessPosition {
 
     public static String algebraicNotation(ChessPosition chessPosition) {
         String[] rows = new String[]{"a", "b", "c", "d", "e", "f", "g", "h"};
-        String row = rows[chessPosition.getRow()];
+        String row = rows[chessPosition.getRow()-1];
         return row + chessPosition.getColumn();
     }
 }

@@ -98,7 +98,7 @@ public class SQLGameDAO implements GameDAO {
                 ps.setString(1, updatedGame.whiteUsername());
                 ps.setString(2, updatedGame.blackUsername());
                 ps.setString(3, updatedGame.gameName());
-                String jsonGame = new Gson().toJson(new ChessGame());
+                String jsonGame = new Gson().toJson(updatedGame.game());
                 ps.setString(4, jsonGame);
                 ps.setInt(5, updatedGame.gameID());
                 ps.executeUpdate();

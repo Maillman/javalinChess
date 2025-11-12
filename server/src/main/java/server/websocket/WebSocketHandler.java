@@ -102,7 +102,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         } else {
             throw new InvalidMoveException("Not your piece to move");
         }
-//        chessGame.makeMove(move);
         GameData updatedGame = GameData.updateGameInGameData(game, chessGame);
         gameService.updateGame(updatedGame);
         return chessGame;
