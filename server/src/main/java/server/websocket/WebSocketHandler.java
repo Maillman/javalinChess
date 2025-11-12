@@ -5,13 +5,12 @@ import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import io.javalin.websocket.*;
 import model.GameData;
-import model.UserData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
-import service.ClearService;
 import service.GameService;
 import service.UserService;
 import websocket.commands.*;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
@@ -54,10 +53,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connectionManager.add(command.getAuthToken(), session, command.getGameID());
         String username = userService.getUsername(command.getAuthToken());
         GameData game = gameService.getGame(command.getGameID());
-        //TODO: Handle logic for user joining as either player or observer
-        String notification = String.format("%s has joined the game as %s", username, "TODO");
+        LoadGameMessage loadGameMessage = new LoadGameMessage(game.game());
+        connectionManager.displayToSession(session, loadGameMessage);
+        String isJoiningAs = isJoiningAs(username, game);
+        String notification = String.format("%s has joined the game as %s", username, isJoiningAs);
         NotificationMessage notificationMessage = new NotificationMessage(notification);
         connectionManager.broadcastOthers(command.getAuthToken(), command.getGameID(), notificationMessage);
+    }
+
+    private String isJoiningAs(String username, GameData game) {
+        if(username.equals(game.whiteUsername())) {
+            return "white";
+        } else if(username.equals(game.blackUsername())) {
+            return "black";
+        } else {
+            return "an observer";
+        }
     }
 
     private void handleMakeMoveCommand(MakeMoveCommand command, Session session) {
