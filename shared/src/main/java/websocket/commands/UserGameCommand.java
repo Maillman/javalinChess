@@ -72,7 +72,7 @@ public class UserGameCommand {
                 switch(CommandType.valueOf(commandType)) {
                     case CONNECT -> userGameCommand = ctx.deserialize(jsonElement, ConnectCommand.class);
                     case MAKE_MOVE -> userGameCommand = ctx.deserialize(jsonElement, MakeMoveCommand.class);
-                    case LEAVE -> userGameCommand = ctx.deserialize(jsonElement, UserGameCommand.class);
+                    case LEAVE -> userGameCommand = ctx.deserialize(jsonElement, LeaveCommand.class);
                     case RESIGN -> userGameCommand = ctx.deserialize(jsonElement, ResignCommand.class);
                 }
             }
