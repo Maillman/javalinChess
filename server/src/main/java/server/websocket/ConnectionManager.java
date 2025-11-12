@@ -5,8 +5,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
@@ -34,10 +33,18 @@ public class ConnectionManager {
         session.getRemote().sendString(new Gson().toJson(serverMessage));
     }
     public void broadcastOthers(String excludeAuthToken, int gameID, ServerMessage serverMessage) throws IOException {
+        Collection<Connection> removeList = new ArrayList<>();
         for(Connection c : connections.get(gameID)) {
             if(!c.getAuthToken().equals(excludeAuthToken)) {
-                c.getSession().getRemote().sendString(new Gson().toJson(serverMessage));
+                if(c.getSession().isOpen()) {
+                    c.getSession().getRemote().sendString(new Gson().toJson(serverMessage));
+                } else {
+                    removeList.add(c);
+                }
             }
+        }
+        for(Connection c : removeList) {
+            this.remove(c.getAuthToken(), c.getSession(), gameID);
         }
     }
 
