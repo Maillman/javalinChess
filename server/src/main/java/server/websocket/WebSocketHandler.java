@@ -10,10 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import service.GameService;
 import service.UserService;
 import websocket.commands.*;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final UserService userService;
@@ -81,5 +83,15 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void handleResignCommand(ResignCommand command, Session session) {
 
+    }
+
+    public void handleException(DataAccessException e, WsContext ctx) {
+        try {
+            ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
+            connectionManager.displayToSession(ctx.session, errorMessage);
+        }catch (IOException ioException) {
+            System.out.println("Something went wrong sending message to session:");
+            System.out.println(ioException.getMessage());
+        }
     }
 }

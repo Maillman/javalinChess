@@ -66,6 +66,10 @@ public class GameService {
     }
 
     public GameData getGame(Integer gameID) throws DataAccessException {
-        return gameDAO.getGame(gameID);
+        GameData game = gameDAO.getGame(gameID);
+        if(game==null){
+            throw new DataAccessException("Error: game doesn't exist", 400);
+        }
+        return game;
     }
 }

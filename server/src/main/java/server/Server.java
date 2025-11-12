@@ -56,6 +56,7 @@ public class Server {
                     ws.onMessage(webSocketHandler);
                     ws.onClose(webSocketHandler);
                 })
+                .wsException(DataAccessException.class, webSocketHandler::handleException)
                 .exception(DataAccessException.class, handler::handleException);
     }
 
