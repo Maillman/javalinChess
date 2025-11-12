@@ -89,7 +89,33 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String notification = String.format("%s has moved %s from %s to %s", username, updatedChessGame.getBoard().getPiece(endPos), ChessPosition.algebraicNotation(startPos), ChessPosition.algebraicNotation(endPos));
         NotificationMessage notificationMessage = new NotificationMessage(notification);
         connectionManager.broadcastOthers(command.getAuthToken(), command.getGameID(), notificationMessage);
-        //TODO: Handle logic for check/checkmate/stalemate notification
+        NotificationMessage changedStatusMessage = changedStatusMessage(updatedChessGame, username, game);
+        if(changedStatusMessage!=null){
+            connectionManager.broadcastAll(command.getGameID(), changedStatusMessage);
+        }
+    }
+
+    private NotificationMessage changedStatusMessage(ChessGame updatedChessGame, String username, GameData game) {
+        ChessGame.TeamColor opposingTurn =  updatedChessGame.getTeamTurn();
+        if(updatedChessGame.isInCheck(opposingTurn)) {
+            String opposingUsername = username.equals(game.whiteUsername()) ? game.blackUsername() : game.whiteUsername();
+            String checkNotification;
+            if(updatedChessGame.isInCheckmate(opposingTurn)) {
+                //Checkmate
+                checkNotification = String.format("%s is in checkmate. %s wins!", opposingUsername, username);
+            } else {
+                //Check
+                checkNotification = String.format("%s is in check.", opposingUsername);
+            }
+            return new NotificationMessage(checkNotification);
+
+        } else if(updatedChessGame.isInStalemate(opposingTurn)) {
+            //Stalemate
+            String opposingUsername = username.equals(game.whiteUsername()) ? game.blackUsername() : game.whiteUsername();
+            String stalemateNotification = String.format("%s has put %s in stalemate. Draw!", username, opposingUsername);
+            return new NotificationMessage(stalemateNotification);
+        }
+        return null;
     }
 
     private ChessGame handleMoveForPlayer(String username, GameData game, ChessMove move) throws InvalidMoveException, DataAccessException {

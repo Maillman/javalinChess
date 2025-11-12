@@ -23,6 +23,8 @@ public class ChessGame {
 
     ChessMove prevMove;
 
+    boolean isOver;
+
     public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard();
@@ -32,6 +34,7 @@ public class ChessGame {
         this.bqCastle = true;
         this.bkCastle = true;
         this.prevMove = null;
+        this.isOver = false;
     }
 
     public ChessGame(ChessBoard board, TeamColor team) {
@@ -65,6 +68,7 @@ public class ChessGame {
         hash = 53 * hash + (this.bqCastle ? 1 : 0);
         hash = 53 * hash + (this.bkCastle ? 1 : 0);
         hash = 53 * hash + Objects.hashCode(this.prevMove);
+        hash = 53 * hash + (this.isOver ? 1 : 0);
         return hash;
     }
 
@@ -98,6 +102,9 @@ public class ChessGame {
         if (this.teamTurn != other.teamTurn) {
             return false;
         }
+        if (this.isOver != other.isOver) {
+            return false;
+        }
         return Objects.equals(this.prevMove, other.prevMove);
     }
 
@@ -124,7 +131,7 @@ public class ChessGame {
         TeamColor pieceColor = piece.getTeamColor();
         Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new HashSet<>();
-        Collection validMovesForColor = allValidMovesForColor(pieceColor);
+        Collection<ChessMove> validMovesForColor = allValidMovesForColor(pieceColor);
         for (ChessMove move : possibleMoves) {
             if (validMovesForColor.contains(move)) {
                 validMoves.add(move);
@@ -228,6 +235,9 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if(isOver()) {
+            throw new InvalidMoveException("Game is over");
+        }
         ChessPiece piece = board.getPiece(move.getStartPosition());
         if (piece == null) {
             throw new InvalidMoveException("No piece there");
@@ -242,15 +252,10 @@ public class ChessGame {
         }
         movePiece(move);
         this.prevMove = move;
-        switch (teamTurn) {
-            case WHITE:
-                this.teamTurn = TeamColor.BLACK;
-                break;
-            case BLACK:
-                this.teamTurn = TeamColor.WHITE;
-                break;
-            default:
-                this.teamTurn = TeamColor.WHITE;
+        if (Objects.requireNonNull(teamTurn) == TeamColor.WHITE) {
+            this.teamTurn = TeamColor.BLACK;
+        } else {
+            this.teamTurn = TeamColor.WHITE;
         }
     }
 
@@ -377,8 +382,6 @@ public class ChessGame {
         return switch (teamColor) {
             case WHITE ->
                 TeamColor.BLACK;
-            case BLACK ->
-                TeamColor.WHITE;
             default ->
                 TeamColor.WHITE;
         };
@@ -475,5 +478,13 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return this.board;
+    }
+
+    public boolean isOver() {
+        return isOver;
+    }
+
+    public void setOver(boolean over) {
+        isOver = over;
     }
 }
