@@ -46,7 +46,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             case CONNECT -> handleConnectCommand((ConnectCommand) userGameCommand, ctx.session);
             case MAKE_MOVE -> handleMakeMoveCommand((MakeMoveCommand) userGameCommand);
             case LEAVE -> handleLeaveCommand((LeaveCommand) userGameCommand, ctx.session);
-            case RESIGN -> handleResignCommand((ResignCommand) userGameCommand, ctx.session);
+            case RESIGN -> handleResignCommand((ResignCommand) userGameCommand);
         }
     }
 
@@ -56,8 +56,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void handleConnectCommand(ConnectCommand command, Session session) throws IOException, DataAccessException {
-        connectionManager.add(command.getAuthToken(), session, command.getGameID());
         String username = userService.getUsername(command.getAuthToken());
+        connectionManager.add(command.getAuthToken(), session, command.getGameID());
         GameData game = gameService.getGame(command.getGameID());
         LoadGameMessage loadGameMessage = new LoadGameMessage(game.game());
         connectionManager.displayToSession(session, loadGameMessage);
@@ -137,12 +137,35 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         return new Pair<>(chessGame, changedStatusMessage);
     }
 
-    private void handleLeaveCommand(LeaveCommand command, Session session) {
-
+    private void handleLeaveCommand(LeaveCommand command, Session session) throws DataAccessException, IOException {
+        String username = userService.getUsername(command.getAuthToken());
+        connectionManager.remove(command.getAuthToken(), session, command.getGameID());
+        NotificationMessage notificationMessage = new NotificationMessage(username + " has left the game");
+        connectionManager.broadcastOthers(command.getAuthToken(), command.getGameID(), notificationMessage);
     }
 
-    private void handleResignCommand(ResignCommand command, Session session) {
+    private void handleResignCommand(ResignCommand command) throws DataAccessException, IOException {
+        String username = userService.getUsername(command.getAuthToken());
+        GameData game = gameService.getGame(command.getGameID());
+        NotificationMessage notificationMessage = handleResignation(username, game);
+        connectionManager.broadcastAll(command.getGameID(), notificationMessage);
+    }
 
+    private NotificationMessage handleResignation(String username, GameData game) throws DataAccessException {
+        String opposingPlayer;
+        if(username.equals(game.whiteUsername())) {
+            opposingPlayer = game.blackUsername();
+        } else if(username.equals(game.blackUsername())) {
+            opposingPlayer = game.whiteUsername();
+        } else {
+            throw new DataAccessException("You are not a player, you cannot resign.");
+        }
+        String notification = String.format("%s has resigned from the game. %s wins!", username, opposingPlayer);
+        ChessGame chessGame = game.game();
+        chessGame.setOver(true);
+        GameData updatedGame = GameData.updateGameInGameData(game, chessGame);
+        gameService.updateGame(updatedGame);
+        return new NotificationMessage(notification);
     }
 
     public void handleException(Exception e, WsContext ctx) {
