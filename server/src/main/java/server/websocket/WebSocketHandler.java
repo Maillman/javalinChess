@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import io.javalin.websocket.*;
+import kotlin.Pair;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,6 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final UserService userService;
@@ -44,7 +44,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         UserGameCommand userGameCommand = gson.fromJson(ctx.message(), UserGameCommand.class);
         switch (userGameCommand.getCommandType()) {
             case CONNECT -> handleConnectCommand((ConnectCommand) userGameCommand, ctx.session);
-            case MAKE_MOVE -> handleMakeMoveCommand((MakeMoveCommand) userGameCommand, ctx.session);
+            case MAKE_MOVE -> handleMakeMoveCommand((MakeMoveCommand) userGameCommand);
             case LEAVE -> handleLeaveCommand((LeaveCommand) userGameCommand, ctx.session);
             case RESIGN -> handleResignCommand((ResignCommand) userGameCommand, ctx.session);
         }
@@ -77,11 +77,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void handleMakeMoveCommand(MakeMoveCommand command, Session session) throws DataAccessException, InvalidMoveException, IOException {
+    private void handleMakeMoveCommand(MakeMoveCommand command) throws DataAccessException, InvalidMoveException, IOException {
         String username = userService.getUsername(command.getAuthToken());
         GameData game = gameService.getGame(command.getGameID());
         ChessMove move = command.getMove();
-        ChessGame updatedChessGame = handleMoveForPlayer(username, game, move);
+        Pair<ChessGame, NotificationMessage> gameNotificationMessagePair = handleMoveForPlayer(username, game, move);
+        ChessGame updatedChessGame = gameNotificationMessagePair.getFirst();
         LoadGameMessage loadGameMessage = new LoadGameMessage(updatedChessGame);
         connectionManager.broadcastAll(game.gameID(), loadGameMessage);
         ChessPosition startPos = move.getStartPosition();
@@ -89,9 +90,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String notification = String.format("%s has moved %s from %s to %s", username, updatedChessGame.getBoard().getPiece(endPos), ChessPosition.algebraicNotation(startPos), ChessPosition.algebraicNotation(endPos));
         NotificationMessage notificationMessage = new NotificationMessage(notification);
         connectionManager.broadcastOthers(command.getAuthToken(), command.getGameID(), notificationMessage);
-        NotificationMessage changedStatusMessage = changedStatusMessage(updatedChessGame, username, game);
+        NotificationMessage changedStatusMessage = gameNotificationMessagePair.getSecond();
         if(changedStatusMessage!=null){
-            connectionManager.broadcastAll(command.getGameID(), changedStatusMessage);
+            connectionManager.broadcastAll(game.gameID(), changedStatusMessage);
         }
     }
 
@@ -103,6 +104,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             if(updatedChessGame.isInCheckmate(opposingTurn)) {
                 //Checkmate
                 checkNotification = String.format("%s is in checkmate. %s wins!", opposingUsername, username);
+                updatedChessGame.setOver(true);
             } else {
                 //Check
                 checkNotification = String.format("%s is in check.", opposingUsername);
@@ -113,12 +115,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             //Stalemate
             String opposingUsername = username.equals(game.whiteUsername()) ? game.blackUsername() : game.whiteUsername();
             String stalemateNotification = String.format("%s has put %s in stalemate. Draw!", username, opposingUsername);
+            updatedChessGame.setOver(true);
             return new NotificationMessage(stalemateNotification);
         }
         return null;
     }
 
-    private ChessGame handleMoveForPlayer(String username, GameData game, ChessMove move) throws InvalidMoveException, DataAccessException {
+    private Pair<ChessGame, NotificationMessage> handleMoveForPlayer(String username, GameData game, ChessMove move) throws InvalidMoveException, DataAccessException {
         ChessGame chessGame = game.game();
         ChessGame.TeamColor teamTurn = chessGame.getTeamTurn();
         if(username.equals(game.whiteUsername()) && teamTurn == ChessGame.TeamColor.WHITE ||
@@ -128,9 +131,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         } else {
             throw new InvalidMoveException("Not your piece to move");
         }
+        NotificationMessage changedStatusMessage = changedStatusMessage(chessGame, username, game);
         GameData updatedGame = GameData.updateGameInGameData(game, chessGame);
         gameService.updateGame(updatedGame);
-        return chessGame;
+        return new Pair<>(chessGame, changedStatusMessage);
     }
 
     private void handleLeaveCommand(LeaveCommand command, Session session) {
