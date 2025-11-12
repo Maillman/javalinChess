@@ -139,9 +139,24 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void handleLeaveCommand(LeaveCommand command, Session session) throws DataAccessException, IOException {
         String username = userService.getUsername(command.getAuthToken());
+        GameData game = gameService.getGame(command.getGameID());
+        handlePlayerLeaving(username, game);
         connectionManager.remove(command.getAuthToken(), session, command.getGameID());
         NotificationMessage notificationMessage = new NotificationMessage(username + " has left the game");
         connectionManager.broadcastOthers(command.getAuthToken(), command.getGameID(), notificationMessage);
+    }
+
+    private void handlePlayerLeaving(String username, GameData game) throws DataAccessException {
+        String updatedWhiteUsername = game.whiteUsername();
+        String updatedBlackUsername = game.blackUsername();
+        if(username.equals(game.whiteUsername())) {
+            updatedWhiteUsername = null;
+        } else if(username.equals(game.blackUsername())) {
+            updatedBlackUsername = null;
+        }
+        if(updatedWhiteUsername == null || updatedBlackUsername == null) {
+            gameService.updateGame(new GameData(game.gameID(), updatedWhiteUsername, updatedBlackUsername, game.gameName(), game.game()));
+        }
     }
 
     private void handleResignCommand(ResignCommand command) throws DataAccessException, IOException {
