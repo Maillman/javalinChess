@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class PostloginUI extends ClientUI{
     private final String username;
-    private Map<Integer, GameData> savedGames;
+    private Map<Integer, GameData> savedGames = new HashMap<>();
     public PostloginUI(ServerFacade serverFacade, Scanner scanner, PrintStream out, String username) {
         super(serverFacade, scanner, out);
         this.username = username;

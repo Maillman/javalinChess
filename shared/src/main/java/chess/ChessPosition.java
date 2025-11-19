@@ -7,7 +7,7 @@ package chess;
  * existing methods.
  */
 public class ChessPosition {
-    private static final char[] rows = new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+    private static final char[] COLS = new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
 
     private final int row;
     private final int col;
@@ -69,8 +69,8 @@ public class ChessPosition {
 
 
     public static String toAlgebraicNotation(ChessPosition chessPosition) {
-        String row = String.valueOf(rows[chessPosition.getRow()-1]);
-        return row + chessPosition.getColumn();
+        String column = String.valueOf(COLS[chessPosition.getColumn()-1]);
+        return column + chessPosition.getRow();
     }
 
     public static ChessPosition fromAlgebraicNotation(String algebraicNotation) {
@@ -78,8 +78,8 @@ public class ChessPosition {
             throw new IllegalArgumentException("Position was not in algebraic notation");
         }
         char[] splitNotation = algebraicNotation.toCharArray();
-        int row = splitNotation[0] - rows[0] + 1;
-        int column = splitNotation[1] - '0';
+        int column = splitNotation[0] - COLS[0] + 1;
+        int row = splitNotation[1] - '0';
         return new ChessPosition(row, column);
     }
 }

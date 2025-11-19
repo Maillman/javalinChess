@@ -56,6 +56,10 @@ public class ChessPiece {
         return sb.toString();
     }
 
+    public String printPiece() {
+        return pieceColor + " " + type;
+    }
+
     /**
      * The various different chess piece options
      */
