@@ -87,7 +87,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connectionManager.broadcastAll(game.gameID(), loadGameMessage);
         ChessPosition startPos = move.getStartPosition();
         ChessPosition endPos = move.getEndPosition();
-        String notification = String.format("%s has moved %s from %s to %s", username, updatedChessGame.getBoard().getPiece(endPos), ChessPosition.algebraicNotation(startPos), ChessPosition.algebraicNotation(endPos));
+        String notification = String.format("%s has moved %s from %s to %s", username, updatedChessGame.getBoard().getPiece(endPos), ChessPosition.toAlgebraicNotation(startPos), ChessPosition.toAlgebraicNotation(endPos));
         NotificationMessage notificationMessage = new NotificationMessage(notification);
         connectionManager.broadcastOthers(command.getAuthToken(), command.getGameID(), notificationMessage);
         NotificationMessage changedStatusMessage = gameNotificationMessagePair.getSecond();

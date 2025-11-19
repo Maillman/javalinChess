@@ -1,6 +1,7 @@
 package client;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -23,9 +24,15 @@ public class WebSocketCommunicator extends Endpoint {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
 
-            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-                ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                serverMessageObserver.notify(serverMessage);
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    Gson gson = new GsonBuilder()
+                            .registerTypeAdapter(ServerMessage.class, new ServerMessage.ServerMessageAdapter())
+                            .create();
+                    ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+                    serverMessageObserver.notify(serverMessage);
+                }
             });
         } catch (URISyntaxException | DeploymentException | IOException ex) {
             throw new ResponseException(ex.getMessage());

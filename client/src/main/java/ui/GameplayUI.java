@@ -1,22 +1,35 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import client.ResponseException;
 import client.ServerFacade;
 import client.ServerMessageObserver;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.PrintStream;
 import java.util.Scanner;
 
 public class GameplayUI extends ClientUI implements ServerMessageObserver {
-    private String username;
-    private GameplayState currentGameplayState;
+    private final String username;
+    private final GameplayState currentGameplayState;
     private ChessGame currentGame;
 
     @Override
     public void notify(ServerMessage serverMessage) {
-
+        switch (serverMessage.getServerMessageType()) {
+            case LOAD_GAME -> {
+                currentGame = ((LoadGameMessage) serverMessage).getGame();
+                redraw();
+            }
+            case ERROR -> displayError(((ErrorMessage) serverMessage).getErrorMessage());
+            case NOTIFICATION -> out.println(((NotificationMessage) serverMessage).getMessage());
+        }
     }
 
     public enum GameplayState {
@@ -63,11 +76,31 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
     }
 
     private Object move() {
-        return null;
+        out.println("What's the starting position (in algebraic notation)?");
+        String startPosString = scanner.nextLine();
+        ChessPosition startPos = ChessPosition.fromAlgebraicNotation(startPosString);
+        out.println("What's the ending position (in algebraic notation)?");
+        String endPosString = scanner.nextLine();
+        ChessPosition endPos = ChessPosition.fromAlgebraicNotation(endPosString);
+        //TODO: Handle promotion piece for pawns
+        ChessPiece.PieceType pieceType = null;
+        return handleServerOperation(() -> {
+            serverFacade.makeMove(new ChessMove(startPos, endPos, pieceType));
+            return null;
+        });
     }
 
     private Object resign() {
-        return null;
+        out.println("Are you sure you want to resign (yes/no)?");
+        String confirmation = scanner.nextLine();
+        if(confirmation.equalsIgnoreCase("yes")) {
+            return handleServerOperation(() -> {
+                serverFacade.resignGame();
+                return "You have resigned from the game!";
+            });
+        } else {
+            return "You have chosen not to resign from the game.";
+        }
     }
 
     private Object redraw() {

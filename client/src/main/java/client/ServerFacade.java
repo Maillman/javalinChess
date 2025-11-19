@@ -49,6 +49,8 @@ public class ServerFacade {
     public void joinGame(String playerColor, int gameID) throws ResponseException {
         JoinData joinData = new JoinData(playerColor, gameID);
         httpCommunicator.makeRequest("PUT", "/game", joinData, authToken, null);
+    }
+    public void connectGame(int gameID) throws ResponseException {
         this.gameID = gameID;
         ConnectCommand connectCommand = new ConnectCommand(authToken, gameID);
         webSocketCommunicator.sendUserGameCommand(connectCommand);

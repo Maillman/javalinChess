@@ -24,9 +24,13 @@ public abstract class ClientUI {
         try {
             return serverCall.execute();
         }catch(ResponseException ex){
-            out.println(EscapeSequences.SET_TEXT_COLOR_RED + ex.getMessage());
+            displayError(ex.getMessage());
             return null;
         }
+    }
+
+    protected void displayError(String errorMessage) {
+        out.println(EscapeSequences.SET_TEXT_COLOR_RED + errorMessage);
     }
 
     @FunctionalInterface
