@@ -1,14 +1,23 @@
 package ui;
 
 import chess.ChessGame;
+import client.ResponseException;
 import client.ServerFacade;
+import client.ServerMessageObserver;
+import websocket.messages.ServerMessage;
 
 import java.io.PrintStream;
 import java.util.Scanner;
 
-public class GameplayUI extends ClientUI {
+public class GameplayUI extends ClientUI implements ServerMessageObserver {
     private String username;
     private GameplayState currentGameplayState;
+
+    @Override
+    public void notify(ServerMessage serverMessage) {
+
+    }
+
     public enum GameplayState {
         WHITE,
         BLACK,
@@ -16,6 +25,10 @@ public class GameplayUI extends ClientUI {
     }
     public GameplayUI(ServerFacade serverFacade, Scanner scanner, PrintStream out, String username, String state) {
         super(serverFacade, scanner, out);
+        handleServerOperation(() -> {
+            this.serverFacade.createWebSocketCommunicator(this);
+            return null;
+        });
         this.username = username;
         switch(state) {
             case "WHITE" -> this.currentGameplayState = GameplayState.WHITE;
@@ -35,8 +48,8 @@ public class GameplayUI extends ClientUI {
             }
             case "quit" -> {
                 Object result = leave();
-                if(result instanceof ClientUI) {
-                    return ((ClientUI) result).eval("quit");
+                if(result instanceof ClientUI clientUI) {
+                    return clientUI.eval("quit");
                 }
                 return "quit";
             }

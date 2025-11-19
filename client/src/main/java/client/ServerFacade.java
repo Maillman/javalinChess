@@ -5,11 +5,19 @@ import model.*;
 import java.util.*;
 
 public class ServerFacade {
+    private final String url;
     private final HTTPCommunicator httpCommunicator;
+    private WebSocketCommunicator webSocketCommunicator;
     private String authToken = null;
 
     public ServerFacade(String url) {
+        this.url = url;
         this.httpCommunicator = new HTTPCommunicator(url);
+        this.webSocketCommunicator = null;
+    }
+
+    public void createWebSocketCommunicator(ServerMessageObserver serverMessageObserver) throws ResponseException {
+        this.webSocketCommunicator = new WebSocketCommunicator(url, serverMessageObserver);
     }
 
     public AuthData register(UserData user) throws ResponseException {
