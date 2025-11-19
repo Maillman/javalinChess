@@ -33,6 +33,10 @@ public abstract class ClientUI {
         out.println(EscapeSequences.SET_TEXT_COLOR_RED + errorMessage);
     }
 
+    public void printPrompt() {
+        out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + currentState() + " >>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
+    }
+
     @FunctionalInterface
     protected interface ServerCall<T> {
         T execute() throws ResponseException;

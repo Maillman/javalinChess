@@ -53,7 +53,7 @@ public class ServerMessage {
         public ServerMessage deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext ctx) throws JsonParseException {
             ServerMessage serverMessage = null;
             if (jsonElement.isJsonObject()) {
-                String serverMessageType = jsonElement.getAsJsonObject().get("commandType").getAsString();
+                String serverMessageType = jsonElement.getAsJsonObject().get("serverMessageType").getAsString();
                 switch(ServerMessage.ServerMessageType.valueOf(serverMessageType)) {
                     case LOAD_GAME -> serverMessage = ctx.deserialize(jsonElement, LoadGameMessage.class);
                     case ERROR -> serverMessage = ctx.deserialize(jsonElement, ErrorMessage.class);

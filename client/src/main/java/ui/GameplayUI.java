@@ -4,7 +4,6 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
-import client.ResponseException;
 import client.ServerFacade;
 import client.ServerMessageObserver;
 import websocket.messages.ErrorMessage;
@@ -22,6 +21,7 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
 
     @Override
     public void notify(ServerMessage serverMessage) {
+        out.println();
         switch (serverMessage.getServerMessageType()) {
             case LOAD_GAME -> {
                 currentGame = ((LoadGameMessage) serverMessage).getGame();
@@ -30,6 +30,7 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
             case ERROR -> displayError(((ErrorMessage) serverMessage).getErrorMessage());
             case NOTIFICATION -> out.println(((NotificationMessage) serverMessage).getMessage());
         }
+        printPrompt();
     }
 
     public enum GameplayState {

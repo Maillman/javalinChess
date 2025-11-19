@@ -26,7 +26,7 @@ public class ChessClient {
 
         Object result = "";
         while (!result.equals("quit")) {
-            printPrompt();
+            currentUI.printPrompt();
             String line = scanner.nextLine();
 
             try {
@@ -43,9 +43,5 @@ public class ChessClient {
             }
         }
         System.out.println();
-    }
-
-    private void printPrompt() {
-        System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + currentUI.currentState() + " >>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
     }
 }
