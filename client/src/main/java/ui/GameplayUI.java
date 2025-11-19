@@ -83,8 +83,26 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
         out.println("What's the ending position (in algebraic notation)?");
         String endPosString = scanner.nextLine();
         ChessPosition endPos = ChessPosition.fromAlgebraicNotation(endPosString);
-        //TODO: Handle promotion piece for pawns
-        ChessPiece.PieceType pieceType = null;
+        ChessPiece startingPiece = currentGame.getBoard().getPiece(startPos);
+        ChessPiece.PieceType pendingPieceType = null;
+        if(startingPiece != null && startingPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            int promotingRow = startingPiece.getTeamColor() == ChessGame.TeamColor.WHITE ? 8 : 1;
+            if(endPos.getRow()==promotingRow) {
+                out.println("You can promote!!!");
+                out.println("What would you like to promote to (Q/N/R/B)?");
+                String promotionPiece = scanner.nextLine();
+                switch (promotionPiece) {
+                    case "Q" -> pendingPieceType = ChessPiece.PieceType.QUEEN;
+                    case "N" -> pendingPieceType = ChessPiece.PieceType.KNIGHT;
+                    case "R" -> pendingPieceType = ChessPiece.PieceType.ROOK;
+                    case "B" -> pendingPieceType = ChessPiece.PieceType.BISHOP;
+                    default -> {
+                        return "Not a valid promotion piece.";
+                    }
+                }
+            }
+        }
+        ChessPiece.PieceType pieceType = pendingPieceType;
         return handleServerOperation(() -> {
             serverFacade.makeMove(new ChessMove(startPos, endPos, pieceType));
             return null;
