@@ -89,14 +89,15 @@ public class PostloginUI extends ClientUI{
         }
         AtomicReference<String> color = new AtomicReference<>("OBSERVE");
         return handleServerOperation(() -> {
+            GameplayUI gamePlayUI = null;
+            this.serverFacade.createWebSocketCommunicator(gamePlayUI);
             if(isJoin) {
                 out.println("What color do you want to join as (WHITE|BLACK)?");
                 color.set(scanner.nextLine());
                 serverFacade.joinGame(color.get(), game.gameID());
             }
+            gamePlayUI = new GameplayUI(this.serverFacade, this.scanner, this.out, this.username, color.get());
             out.printf("%s the game!", isJoin ? "Joined" : "Observing");
-            GameplayUI gamePlayUI = new GameplayUI(this.serverFacade, this.scanner, this.out, this.username, color.get());
-            gamePlayUI.eval("redraw");
             return gamePlayUI;
         });
 

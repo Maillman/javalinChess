@@ -12,6 +12,7 @@ import java.util.Scanner;
 public class GameplayUI extends ClientUI implements ServerMessageObserver {
     private String username;
     private GameplayState currentGameplayState;
+    private ChessGame currentGame;
 
     @Override
     public void notify(ServerMessage serverMessage) {
@@ -25,10 +26,6 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
     }
     public GameplayUI(ServerFacade serverFacade, Scanner scanner, PrintStream out, String username, String state) {
         super(serverFacade, scanner, out);
-        handleServerOperation(() -> {
-            this.serverFacade.createWebSocketCommunicator(this);
-            return null;
-        });
         this.username = username;
         switch(state) {
             case "WHITE" -> this.currentGameplayState = GameplayState.WHITE;
@@ -43,8 +40,14 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
             case "redraw" -> {
                 return redraw();
             }
+            case "move" -> {
+                return move();
+            }
             case "leave" -> {
                 return leave();
+            }
+            case "resign" -> {
+                return resign();
             }
             case "quit" -> {
                 Object result = leave();
@@ -59,22 +62,35 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
         }
     }
 
+    private Object move() {
+        return null;
+    }
+
+    private Object resign() {
+        return null;
+    }
+
     private Object redraw() {
         this.out.println(EscapeSequences.RESET_TEXT_COLOR);
-        ChessBoardUI.drawChessBoard(this.out, new ChessGame(), this.currentGameplayState, null);
+        ChessBoardUI.drawChessBoard(this.out, currentGame, this.currentGameplayState, null);
         return null;
     }
 
     private Object leave() {
         out.println("Leaving the game!");
-        return new PostloginUI(this.serverFacade, this.scanner, this.out, this.username);
+        return handleServerOperation(() -> {
+            serverFacade.leaveGame();
+            return new PostloginUI(this.serverFacade, this.scanner, this.out, this.username);
+        });
     }
 
     @Override
     public String help() {
         return """
                 redraw - Redraw the current board
+                move - Move a piece on the board
                 leave - Leave the game
+                resign - Resign from the game
                 help - Run this help menu
                 quit - Quit this application""";
     }
