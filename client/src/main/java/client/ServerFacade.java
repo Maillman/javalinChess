@@ -1,6 +1,11 @@
 package client;
 
+import chess.ChessMove;
 import model.*;
+import websocket.commands.ConnectCommand;
+import websocket.commands.LeaveCommand;
+import websocket.commands.MakeMoveCommand;
+import websocket.commands.ResignCommand;
 
 import java.util.*;
 
@@ -9,6 +14,7 @@ public class ServerFacade {
     private final HTTPCommunicator httpCommunicator;
     private WebSocketCommunicator webSocketCommunicator;
     private String authToken = null;
+    private Integer gameID = null;
 
     public ServerFacade(String url) {
         this.url = url;
@@ -43,6 +49,21 @@ public class ServerFacade {
     public void joinGame(String playerColor, int gameID) throws ResponseException {
         JoinData joinData = new JoinData(playerColor, gameID);
         httpCommunicator.makeRequest("PUT", "/game", joinData, authToken, null);
+        this.gameID = gameID;
+        ConnectCommand connectCommand = new ConnectCommand(authToken, gameID);
+        webSocketCommunicator.sendUserGameCommand(connectCommand);
+    }
+    public void leaveGame() throws ResponseException {
+        LeaveCommand leaveCommand = new LeaveCommand(authToken, gameID);
+        webSocketCommunicator.sendUserGameCommand(leaveCommand);
+    }
+    public void makeMove(ChessMove move) throws ResponseException {
+        MakeMoveCommand makeMoveCommand = new MakeMoveCommand(authToken, gameID, move);
+        webSocketCommunicator.sendUserGameCommand(makeMoveCommand);
+    }
+    public void resignGame() throws ResponseException {
+        ResignCommand resignCommand = new ResignCommand(authToken, gameID);
+        webSocketCommunicator.sendUserGameCommand(resignCommand);
     }
     public void clear() throws ResponseException {
         httpCommunicator.makeRequest("DELETE", "/db", null, null, null);
