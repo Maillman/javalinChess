@@ -74,12 +74,17 @@ public class ChessPosition {
     }
 
     public static ChessPosition fromAlgebraicNotation(String algebraicNotation) {
-        if (algebraicNotation.length() < 2) {
+        if (algebraicNotation.length() != 2) {
             throw new IllegalArgumentException("Position was not in algebraic notation");
         }
         char[] splitNotation = algebraicNotation.toCharArray();
         int column = splitNotation[0] - COLS[0] + 1;
         int row = splitNotation[1] - '0';
+        if(row < 1 || row > 8 || column < 1 || column > 8) {
+            throw new IllegalArgumentException("""
+                    Position was parsed correctly.
+                    Ensure it is in algebraic notation and in bounds.""");
+        }
         return new ChessPosition(row, column);
     }
 }

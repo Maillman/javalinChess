@@ -37,9 +37,9 @@ public class ChessClient {
                     case null -> result = "";
                     default -> throw new RuntimeException("Received unknown result");
                 }
-            } catch (Throwable e) {
-                var msg = e.toString();
-                System.out.print(msg);
+            } catch (Exception e) {
+                String msg = e.getMessage();
+                currentUI.displayError(msg);
             }
         }
         System.out.println();

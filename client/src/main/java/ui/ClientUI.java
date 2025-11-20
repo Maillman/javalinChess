@@ -29,7 +29,7 @@ public abstract class ClientUI {
         }
     }
 
-    protected void displayError(String errorMessage) {
+    public void displayError(String errorMessage) {
         out.println(EscapeSequences.SET_TEXT_COLOR_RED + errorMessage);
     }
 
