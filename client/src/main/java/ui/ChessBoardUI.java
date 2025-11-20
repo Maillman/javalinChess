@@ -1,11 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
+import java.util.Collection;
+import java.util.HashSet;
 
 public class ChessBoardUI {
     private static final int BOARD_SIZE_IN_SQUARES = 8;
@@ -14,13 +13,25 @@ public class ChessBoardUI {
     private static final String[] LETTERS = new String[]{"a","b","c","d","e","f","g","h"};
 
     public static void main(String[] args) {
+        ChessPosition pawnMove = new ChessPosition(2, 5);
+        ChessPosition emptySquare = new ChessPosition(4, 5);
         drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.WHITE, null);
         drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.BLACK, null);
         drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.OBSERVER, null);
+        drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.WHITE, pawnMove);
+        drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.BLACK, pawnMove);
+        drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.OBSERVER, pawnMove);
+        drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.WHITE, emptySquare);
+        drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.BLACK, emptySquare);
+        drawChessBoard(System.out, new ChessGame(), GameplayUI.GameplayState.OBSERVER, emptySquare);
     }
 
     public static void drawChessBoard(PrintStream out, ChessGame theGame, GameplayUI.GameplayState perspective, ChessPosition position) {
-        //TODO: Do something w/ position in the future!
+        Collection<ChessPosition> endPositions = new HashSet<>();
+        if(position!= null) {
+            Collection<ChessMove> chessMoves = theGame.validMoves(position);
+            chessMoves.forEach((chessMove -> endPositions.add(chessMove.getEndPosition())));
+        }
         ChessBoard board = theGame.getBoard();
         for(int row = 0; row < BOARD_SIZE_IN_SQUARES; row++) {
             if(row == 0) {
@@ -30,18 +41,15 @@ public class ChessBoardUI {
                 if(col == 0){
                     printRowNumber(out, perspective, row);
                 }
-                if((row + col) % 2 == 1){
-                    out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
-                } else {
-                    out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-                }
-                out.print(' ');
-                ChessPiece curPiece;
+                ChessPosition getPosition;
                 if(perspective != GameplayUI.GameplayState.BLACK) {
-                    curPiece = board.getPiece(new ChessPosition(9 - (row + 1), col + 1));
+                    getPosition = new ChessPosition(9 - (row + 1), col + 1);
                 } else {
-                    curPiece = board.getPiece(new ChessPosition(row + 1, 9 - (col + 1)));
+                    getPosition = new ChessPosition(row + 1, 9 - (col + 1));
                 }
+                setSquareColor(out, position, getPosition, row, col, endPositions);
+                out.print(' ');
+                ChessPiece curPiece = board.getPiece(getPosition);
                 out.print(getString(curPiece));
                 out.print(' ');
                 if(col == 7){
@@ -52,6 +60,26 @@ public class ChessBoardUI {
             out.print("\n");
             if(row == 7) {
                 printColumnLetters(out, perspective);
+            }
+        }
+    }
+
+    private static void setSquareColor(PrintStream out, ChessPosition position, ChessPosition getPosition, int row, int col, Collection<ChessPosition> endPositions) {
+        if(getPosition.equals(position)) {
+            out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
+        } else {
+            if ((row + col) % 2 == 1) {
+                if(endPositions.contains(getPosition)) {
+                    out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                } else {
+                    out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+                }
+            } else {
+                if(endPositions.contains(getPosition)) {
+                    out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                } else {
+                    out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                }
             }
         }
     }

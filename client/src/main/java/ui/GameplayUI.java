@@ -25,7 +25,7 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
         switch (serverMessage.getServerMessageType()) {
             case LOAD_GAME -> {
                 currentGame = ((LoadGameMessage) serverMessage).getGame();
-                redraw();
+                redraw(null);
             }
             case ERROR -> displayError(((ErrorMessage) serverMessage).getErrorMessage());
             case NOTIFICATION -> out.println(((NotificationMessage) serverMessage).getMessage());
@@ -52,7 +52,10 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
     public Object eval(String command) {
         switch (command.toLowerCase()){
             case "redraw" -> {
-                return redraw();
+                return redraw(null);
+            }
+            case "highlight" -> {
+                return highlight();
             }
             case "move" -> {
                 return move();
@@ -74,6 +77,13 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
                 return help();
             }
         }
+    }
+
+    private Object highlight() {
+        out.println("What's the position for the piece you want to highlight (in algebraic notation)?");
+        String posString = scanner.nextLine();
+        ChessPosition pos = ChessPosition.fromAlgebraicNotation(posString);
+        return redraw(pos);
     }
 
     private Object move() {
@@ -122,9 +132,9 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
         }
     }
 
-    private Object redraw() {
+    private Object redraw(ChessPosition position) {
         this.out.println(EscapeSequences.RESET_TEXT_COLOR);
-        ChessBoardUI.drawChessBoard(this.out, currentGame, this.currentGameplayState, null);
+        ChessBoardUI.drawChessBoard(this.out, currentGame, this.currentGameplayState, position);
         return null;
     }
 
@@ -140,6 +150,7 @@ public class GameplayUI extends ClientUI implements ServerMessageObserver {
     public String help() {
         return """
                 redraw - Redraw the current board
+                highlight - Highlight moves for a piece
                 move - Move a piece on the board
                 leave - Leave the game
                 resign - Resign from the game
