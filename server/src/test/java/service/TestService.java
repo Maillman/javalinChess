@@ -16,7 +16,7 @@ import model.JoinData;
 import model.ListGamesData;
 import model.UserData;
 
-public class ServiceTests {
+public class TestService {
     private final UserService userService;
     private final GameService gameService;
     private final ClearService clearService;
@@ -25,7 +25,7 @@ public class ServiceTests {
     private static final UserData NEW_USER = new UserData("newUser", "newPass", "newEmail@mail.com");
     private AuthData authData;
 
-    public ServiceTests() {
+    public TestService() {
         UserDAO userDAO = new MemoryUserDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
         GameDAO gameDAO = new MemoryGameDAO();

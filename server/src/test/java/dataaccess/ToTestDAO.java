@@ -12,7 +12,7 @@ import model.GameData;
 import model.ListGamesData;
 import model.UserData;
 
-public class DataAccessObjectTests {
+public class ToTestDAO {
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
@@ -21,7 +21,7 @@ public class DataAccessObjectTests {
     private int existingGameID;
     private GameData existingGame;
 
-    public DataAccessObjectTests() {
+    public ToTestDAO() {
         this.userDAO = new SQLUserDAO();
         this.authDAO = new SQLAuthDAO();
         this.gameDAO = new SQLGameDAO();

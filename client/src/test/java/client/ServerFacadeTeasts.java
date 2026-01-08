@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 import server.Server;
 
 
-public class ServerFacadeTests {
+public class ServerFacadeTeasts {
 
     private static Server server;
     private static ServerFacade serverFacade;
